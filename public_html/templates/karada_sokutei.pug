@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tensorflow</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <ul>
+            each value, index in response.elements.position
+                each valueSub, indexSub in value
+                    <li>#{indexSub}: (#{valueSub.x}; #{valueSub.y})</li>
+            else
+                <li>Empty!</li>
+        </ul>
+        <ul id="distance">
+            each value, index in response.elements.distance
+                <li>#{index}: #{value}</li>
+            else
+                <li>Empty!</li>
+        </ul>
+    </body>
+    
+    script.
+        window.canvasDataUrl = "#{response.canvasDataUrl}";
+        window.elements = '!{elements}';
+    
+    <script src="js/library/jquery_3.4.1.min.js"></script>
+    <script src="js/karada_sokutei.js"></script>
+</html>
