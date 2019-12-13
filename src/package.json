@@ -6,7 +6,7 @@
         "express": "4.17.1",
         "pug": "2.0.4",
         "canvas": "2.6.0",
-        "@tensorflow-models/posenet": "2.2.1",
-        "@tensorflow/tfjs-node": "1.4.0"
+        "@tensorflow/tfjs-node": "1.4.0",
+        "@tensorflow-models/posenet": "2.2.1"
     }
 }
