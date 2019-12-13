@@ -1,12 +1,12 @@
 {
-    "name": "tensorflowjs_example",
+    "name": "tfj_e",
     "version": "1.0.0",
     "author": "cimo",
     "dependencies": {
-        "express": "latest",
-        "pug": "latest",
-        "canvas": "latest",
-        "@tensorflow-models/posenet": "latest",
-        "@tensorflow/tfjs-node": "latest"
+        "express": "4.17.1",
+        "pug": "2.0.4",
+        "canvas": "2.6.0",
+        "@tensorflow-models/posenet": "2.2.1",
+        "@tensorflow/tfjs-node": "1.4.0"
     }
 }

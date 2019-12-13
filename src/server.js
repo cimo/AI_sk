@@ -1,5 +1,5 @@
-var express = require("express");
 var path = require("path");
+var express = require("express");
 var pug = require("pug");
 
 var app = express();
