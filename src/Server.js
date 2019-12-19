@@ -20,7 +20,7 @@ var portHttps = 8443;
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
 
-var karadaSokutei = require("./KaradaSokutei");
+var tf_KaradaSokutei = require("./Tf_KaradaSokutei");
 
 app.set("views", path.join(__dirname, sitePath + "/templates"));
 app.set("view engine", "pug");
@@ -31,7 +31,7 @@ app.get("/", function(req, res) {
     res.render("index.pug");
 });
 app.get("/karada_sokutei", function(req, res) {
-    karadaSokutei.run(function(response) {
+    tf_KaradaSokutei.run(function(response) {
         res.render("karada_sokutei.pug", {'response': response, 'elements': JSON.stringify(response.elements)});
     });
 });
