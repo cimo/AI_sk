@@ -1,8 +1,8 @@
-var path = require("path");
 var express = require("express");
 var fs = require("fs");
 var http = require("http");
 var https = require("https");
+var path = require("path");
 var pug = require("pug");
 
 var app = express();
@@ -12,13 +12,13 @@ var credentials = {
     cert: fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.crt")
 };
 
-var sitePath = "../public_html";
-
-var portHttp = 8080;
-var portHttps = 8443;
-
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
+
+var portHttp = 1080;
+var portHttps = 1443;
+
+var sitePath = "../public";
 
 var tf_KaradaSokutei = require("./Tf_KaradaSokutei");
 

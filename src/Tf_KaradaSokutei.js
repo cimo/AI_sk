@@ -3,9 +3,9 @@ var posenet = require("@tensorflow-models/posenet");
 var {createCanvas, Image} = require("canvas");
 
 exports.run = function(callback) {
-    console.log("Tensorflow running...");
+    console.log("TensorFlowJs running...");
     
-    var sitePath = "../public_html";
+    var sitePath = "../public";
     
     var imageScaleFactor = 0.50;
     var flipHorizontal = false;
@@ -16,7 +16,7 @@ exports.run = function(callback) {
     var response = {};
     
     var execute = async() => {
-        console.log("Tensorflow started.");
+        console.log("TensorFlowJs started.");
         
         var net = await posenet.load({
             'architecture': "MobileNetV1",
@@ -50,7 +50,9 @@ exports.run = function(callback) {
             ctx.fillRect(value.position.x - (pointSize / 2), value.position.y - (pointSize / 2), pointSize, pointSize);
         }
         
-        elements.distance.push(distance(elements.position[1].leftEye, elements.position[2].rightEye));
+        var distance = findDistance(elements.position[1].leftEye, elements.position[2].rightEye);
+        
+        elements.distance.push(distance);
         
         response = {
             'canvasDataUrl': canvas.toDataURL(),
@@ -59,13 +61,13 @@ exports.run = function(callback) {
         
         callback(response);
         
-        console.log("Tensorflow ended.");
+        console.log("TensorFlowJs ended.");
     };
     
     execute();
 };
 
-function distance(p, q) {
+function findDistance(p, q) {
     var dx = p.x - q.x;
     var dy = p.y - q.y;
     var dist = Math.sqrt(dx * dx + dy * dy);

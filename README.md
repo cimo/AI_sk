@@ -1,7 +1,7 @@
 TensorFlowJs example
 ==============
 
-Machine learning code collection.
+TensorFlowJs code collection.
 WORK IN PROGRESS...
 
 | Info: |
@@ -14,6 +14,6 @@ WORK IN PROGRESS...
 
 | Library: |
 |:---|
-| TensorFlowJs - https://www.tensorflow.org/ |
+| TensorFlowJs - https://tensorflow.org/ |
 
-<b>By CIMO - https://www.reinventsoftware.org</b>
+<b>By CIMO - https://reinventsoftware.org</b>
