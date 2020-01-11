@@ -54,3 +54,4 @@ nbproject
 !/var/sessions/.gitkeep
 
 /src/node_modules
+/src/package-lock.json
