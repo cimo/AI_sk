@@ -52,3 +52,5 @@ nbproject
 /src/Config.php
 /var/sessions/*
 !/var/sessions/.gitkeep
+
+/src/node_modules
