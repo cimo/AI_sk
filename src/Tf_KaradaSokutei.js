@@ -26,7 +26,7 @@ exports.run = function(callback) {
         });
         
         let image = new Image();
-        image.src = sitePath + "/images/test.png";
+        image.src = `${sitePath}/images/test.png`;
         
         let canvas = createCanvas(image.width, image.height);
         let ctx = canvas.getContext("2d");

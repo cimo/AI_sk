@@ -17,14 +17,14 @@ const credentials = {
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 
+const portHttp = 1080;
+const portHttps = 1443;
+
+const sitePath = "../public";
+
 const tf_KaradaSokutei = require("./Tf_KaradaSokutei");
 
-let portHttp = 1080;
-let portHttps = 1443;
-
-let sitePath = "../public";
-
-app.set("views", path.join(__dirname, sitePath + "/templates"));
+app.set("views", path.join(__dirname, `${sitePath}/templates`));
 app.set("view engine", "pug");
 
 app.use(express.static(sitePath));
