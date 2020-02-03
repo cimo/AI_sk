@@ -1,16 +1,16 @@
 /* global */
 
-var karadaSokutei = new KaradaSokutei();
+let karadaSokutei = new KaradaSokutei();
 
 function KaradaSokutei() {
     // Vars
-    var self = this;
+    let self = this;
     
-    var dpi;
+    let dpi;
     
-    var elements;
+    let elements;
 
-    var distance;
+    let distance;
     
     // Properties
     
@@ -24,18 +24,18 @@ function KaradaSokutei() {
     };
     
     self.createImage = function() {
-        var canvas = $("#canvas")[0];
-        var ctx = canvas.getContext("2d");
+        let canvas = $("#canvas")[0];
+        let ctx = canvas.getContext("2d");
 
-        var sizeW = 710;
-        var sizeH = 528;
+        let sizeW = 710;
+        let sizeH = 528;
 
-        var image = new Image();
+        let image = new Image();
         image.onload = function() {
-            var scale = Math.min((sizeW / image.width), (sizeH / image.height));
+            let scale = Math.min((sizeW / image.width), (sizeH / image.height));
 
-            var width = image.width * scale;
-            var height = image.height * scale;
+            let width = image.width * scale;
+            let height = image.height * scale;
 
             canvas.width = width;
             canvas.height = height;
@@ -57,12 +57,12 @@ function KaradaSokutei() {
     
     // Functions private
     function screenDpi() {
-        var element = document.createElement('div');
+        let element = document.createElement('div');
         element.style = "width: 1in;";
 
         document.body.appendChild(element);
 
-        var dpi = element.offsetWidth;
+        let dpi = element.offsetWidth;
 
         document.body.removeChild(element);
 

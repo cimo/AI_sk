@@ -1,26 +1,28 @@
-var express = require("express");
-var fs = require("fs");
-var http = require("http");
-var https = require("https");
-var path = require("path");
-var pug = require("pug");
+/* global __dirname */
 
-var app = express();
+const express = require("express");
+const fs = require("fs");
+const http = require("http");
+const https = require("https");
+const path = require("path");
+const pug = require("pug");
 
-var credentials = {
+const app = express();
+
+const credentials = {
     key: fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.key.insecure"),
     cert: fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.crt")
 };
 
-var httpServer = http.createServer(app);
-var httpsServer = https.createServer(credentials, app);
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer(credentials, app);
 
-var portHttp = 1080;
-var portHttps = 1443;
+const tf_KaradaSokutei = require("./Tf_KaradaSokutei");
 
-var sitePath = "../public";
+let portHttp = 1080;
+let portHttps = 1443;
 
-var tf_KaradaSokutei = require("./Tf_KaradaSokutei");
+let sitePath = "../public";
 
 app.set("views", path.join(__dirname, sitePath + "/templates"));
 app.set("view engine", "pug");
