@@ -1,6 +1,6 @@
 /* global */
 
-let karadaSokutei = new KaradaSokutei();
+const karadaSokutei = new KaradaSokutei();
 
 function KaradaSokutei() {
     // Vars
