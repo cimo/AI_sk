@@ -1,3 +1,5 @@
+"use strict";
+
 /* global */
 
 const karadaSokutei = new KaradaSokutei();
@@ -52,12 +54,12 @@ function KaradaSokutei() {
 
         distance = (elements.distance / dpi) * 2.54;
 
-        $("#distance").find("li").eq(0).html(message + distance.toFixed(2) + " cm.");
+        $("#distance").find("li").eq(0).html(`${message} ${distance.toFixed(2)} cm.`);
     };
     
     // Functions private
     function screenDpi() {
-        let element = document.createElement('div');
+        let element = document.createElement("div");
         element.style = "width: 1in;";
 
         document.body.appendChild(element);

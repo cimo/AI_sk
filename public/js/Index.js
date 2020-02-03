@@ -1,3 +1,5 @@
+"use strict";
+
 /* global karadaSokutei */
 
 $(document).ready(function() {

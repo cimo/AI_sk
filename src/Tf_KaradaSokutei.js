@@ -1,3 +1,7 @@
+"use strict";
+
+/* global */
+
 const tf = require("@tensorflow/tfjs-node");
 const posenet = require("@tensorflow-models/posenet");
 const {createCanvas, Image} = require("canvas");
