@@ -6,7 +6,7 @@ const karadaSokutei = new KaradaSokutei();
 
 function KaradaSokutei() {
     // Vars
-    let self = this;
+    const self = this;
     
     let dpi;
     
@@ -19,9 +19,9 @@ function KaradaSokutei() {
     // Functions public
     self.init = function() {
         dpi = 0;
-
+        
         elements = {};
-
+        
         distance = 0;
     };
     
@@ -29,10 +29,11 @@ function KaradaSokutei() {
         let canvas = $("#canvas")[0];
         let ctx = canvas.getContext("2d");
 
-        let sizeW = 710;
-        let sizeH = 528;
+        let sizeW = 640;
+        let sizeH = 480;
 
         let image = new Image();
+        
         image.onload = function() {
             let scale = Math.min((sizeW / image.width), (sizeH / image.height));
 
@@ -44,6 +45,7 @@ function KaradaSokutei() {
 
             ctx.drawImage(image, 0, 0, width, height);
         };
+        
         image.src = window.canvasDataUrl;
     };
     

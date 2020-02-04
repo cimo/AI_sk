@@ -7,29 +7,26 @@ const posenet = require("@tensorflow-models/posenet");
 const {createCanvas, Image} = require("canvas");
 
 exports.run = function(callback) {
-    console.log("TensorFlowJs running...");
+    console.log("Tf_KaradaSokutei running...");
     
     let sitePath = "../public";
-    
-    let imageScaleFactor = 0.50;
-    let flipHorizontal = false;
-    let outputStride = 16;
     
     let pointSize = 5;
     
     let response = {};
     
-    let execute = async() => {
-        console.log("TensorFlowJs started.");
+    const execute = async() => {
+        console.log("Job started.");
         
         let net = await posenet.load({
-            'architecture': "MobileNetV1",
-            'outputStride': 16,
-            'inputResolution': 513,
-            'multiplier': 0.75
+            'architecture': "ResNet50",
+            'outputStride': 32,
+            'inputResolution': 640,
+            'quantBytes': 2
         });
         
         let image = new Image();
+        
         image.src = `${sitePath}/images/test.png`;
         
         let canvas = createCanvas(image.width, image.height);
@@ -38,7 +35,9 @@ exports.run = function(callback) {
         ctx.drawImage(image, 0, 0);
         
         let input = tf.browser.fromPixels(canvas);
-        let pose = await net.estimateSinglePose(input, imageScaleFactor, flipHorizontal, outputStride);
+        let pose = await net.estimateSinglePose(input, {
+            'flipHorizontal': false
+        });
         
         let elements = {'position': [], 'distance': []};
         
@@ -65,7 +64,7 @@ exports.run = function(callback) {
         
         callback(response);
         
-        console.log("TensorFlowJs ended.");
+        console.log("Job ended.");
     };
     
     execute();
@@ -74,7 +73,6 @@ exports.run = function(callback) {
 function findDistance(p, q) {
     let dx = p.x - q.x;
     let dy = p.y - q.y;
-    let dist = Math.sqrt(dx * dx + dy * dy);
     
-    return dist;
+    return Math.sqrt(dx * dx + dy * dy);
 }
