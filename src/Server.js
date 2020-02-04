@@ -12,8 +12,8 @@ const pug = require("pug");
 const app = express();
 
 const credentials = {
-    key: fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.key.insecure"),
-    cert: fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.crt")
+    'key': fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.key.insecure"),
+    'cert': fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.crt")
 };
 
 const httpServer = http.createServer(app);
