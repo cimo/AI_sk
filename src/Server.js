@@ -2,47 +2,81 @@
 
 /* global __dirname */
 
-const express = require("express");
 const fs = require("fs");
+const express = require("express");
 const http = require("http");
 const https = require("https");
-const path = require("path");
 const pug = require("pug");
+const bodyParser = require("body-parser");
+const socketIo = require("socket.io");
 
 const app = express();
 
-const credentials = {
+const certificates = {
     'key': fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.key.insecure"),
     'cert': fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.crt")
 };
 
 const httpServer = http.createServer(app);
-const httpsServer = https.createServer(credentials, app);
+const httpsServer = https.createServer(certificates, app);
 
-const portHttp = 1080;
-const portHttps = 1443;
+const socketIoServer = socketIo(httpServer);
+const socketIosServer = socketIo(httpsServer);
 
-const sitePath = "../public";
+const portHttp = 2080;
+const portHttps = 2443;
 
+const urlRoot = "../public";
+
+let connectionCount = 0;
+
+const sio_Websocket = require("./Sio_Websocket");
 const tf_KaradaSokutei = require("./Tf_KaradaSokutei");
+const tf_Classifier = require("./Tf_Classifier");
 
-app.set("views", path.join(__dirname, `${sitePath}/templates`));
+app.set("views", `${urlRoot}/templates`);
 app.set("view engine", "pug");
 
-app.use(express.static(sitePath));
+app.use(express.static(urlRoot));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({'extended': false}));
 
-app.get("/", function(req, res) {
-    res.render("index.pug");
+app.get("/", (request, result) => {
+    result.render("index.pug");
 });
-app.get("/karada_sokutei", function(req, res) {
-    tf_KaradaSokutei.run(function(response) {
-        res.render("karada_sokutei.pug", {'response': response, 'elements': JSON.stringify(response.elements)});
+app.all("/karada_sokutei", (request, result) => {
+    tf_KaradaSokutei.execute(request, (response) => {
+        if (response.ajax !== undefined)
+            result.json(response);
+        else
+            result.render("karada_sokutei.pug", {'response': response});
+    });
+});
+app.all("/classifier", (request, result) => {
+    tf_Classifier.execute(request, (response) => {
+        if (response.ajax !== undefined)
+            result.json(response);
+        else
+            result.render("classifier.pug", {'response': response});
     });
 });
 
-httpServer.listen(portHttp, function() {
+httpServer.listen(portHttp, () => {
     console.log(`Listen on ${portHttp}`);
 });
-httpsServer.listen(portHttps, function() {
+httpsServer.listen(portHttps, () => {
     console.log(`Listen on ${portHttps}`);
+    
+    tf_KaradaSokutei.startup();
+    
+    tf_Classifier.startup();
+});
+
+socketIoServer.on("connection", (socket) => {
+    //sio_Websocket.startup(socketIoServer, socket);
+});
+socketIosServer.on("connection", (socket) => {
+    sio_Websocket.startup(socketIosServer, socket);
+    
+    tf_Classifier.socketEvent(socket);
 });

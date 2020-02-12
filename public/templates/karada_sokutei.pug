@@ -1,32 +1,29 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>TensorFlowJs</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Karada sokutei</title>
+        
+        <!-- Meta -->
+        <meta charset="UTF-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=1">
+        <meta name="description" content="..."/>
+        <meta name="keywords" content="..."/>
+        <meta name="robots" content="index, follow"/>
+        
+        <!-- Favicon -->
+        <link href="images/favicon.ico" rel="icon" type="image/x-icon">
     </head>
     <body>
-        <canvas id="canvas"></canvas>
-        <ul>
-            each value, index in response.elements.position
-                each valueSub, indexSub in value
-                    <li>#{indexSub}: (#{valueSub.x}; #{valueSub.y})</li>
-            else
-                <li>Empty!</li>
-        </ul>
-        <ul id="distance">
-            each value, index in response.elements.distance
-                <li>#{index}: #{value}</li>
-            else
-                <li>Empty!</li>
-        </ul>
+        <img id="result" src=""/>
+        <ul id="position"></ul>
+        <ul id="distance"></ul>
+        
+        script.
+            window.canvasDataUrl = '!{response.canvasDataUrl}';
+            window.elements = '!{response.elements}';
+        
+        <script src="js/library/jquery_3.4.1.min.js"></script>
+        <script src="js/KaradaSokutei.js"></script>
     </body>
-    
-    script.
-        window.canvasDataUrl = "#{response.canvasDataUrl}";
-        window.elements = '!{elements}';
-    
-    <script src="js/library/jquery_3.4.1.min.js"></script>
-    <script src="js/KaradaSokutei.js"></script>
-    <script src="js/Index.js"></script>
 </html>

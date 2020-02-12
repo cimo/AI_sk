@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Classifier</title>
+        
+        <!-- Meta -->
+        <meta charset="UTF-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=1">
+        <meta name="description" content="..."/>
+        <meta name="keywords" content="..."/>
+        <meta name="robots" content="index, follow"/>
+        
+        <!-- Favicon -->
+        <link href="images/favicon.ico" rel="icon" type="image/x-icon">
+    </head>
+    <body>
+        <div id="main_container">
+            include include/websocket.pug
+            
+            include include/camera.pug
+            
+            <div id="command_container">
+                <div>
+                    <input class="learn_label" name="learnLabel" value=""/>
+                    <button class="learn_button" type="button">Learn</button>
+                </div>
+            </div>
+            
+            <div id="prediction">
+                <p class="text"></p>
+                <p class="label"></p>
+            </div>
+        </div>
+        
+        script.
+            window.prediction = '!{response.prediction}';
+            window.data = '!{response.data}';
+        
+        <script src="js/library/jquery_3.4.1.min.js"></script>
+        <script src="js/library/socket.io_2.3.0.min.js"></script>
+        <script src="js/Websocket.js"></script>
+        <script src="js/Camera.js"></script>
+        <script src="js/Classifier.js"></script>
+        
+        script.
+            $(document).ready(() => {
+                let websocket = new Websocket();
+
+                websocket.messageFromBroadcast("#ws_container .ws_broadcast");
+                websocket.messageFromServer("serverTime", "#ws_container .ws_serverTime");
+                websocket.messageFromServer("message", "#ws_container .ws_message");
+
+                let classifier = new Classifier(websocket);
+
+                classifier.comunication();
+                classifier.eventLogic();
+            });
+    </body>
+</html>
