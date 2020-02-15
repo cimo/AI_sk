@@ -22,8 +22,11 @@
             
             <div id="command_container">
                 <div>
-                    <input class="learn_label" name="learnLabel" value=""/>
-                    <button class="learn_button" type="button">Learn</button>
+                    <button class="learn_file_button" type="button">Learn from file</button>
+                </div>
+                <div>
+                    <input class="learn_camera_label" name="learnFromCameraLabel" value=""/>
+                    <button class="learn_camera_button" type="button">Learn from camera</button>
                 </div>
             </div>
             
@@ -53,7 +56,7 @@
 
                 let classifier = new Classifier(websocket);
 
-                classifier.comunication();
+                classifier.comunication("https://lsv2.machine.local");
                 classifier.eventLogic();
             });
     </body>

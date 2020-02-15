@@ -2,6 +2,12 @@
     "name": "tfj_e",
     "version": "1.0.0",
     "author": "cimo",
+    "description": "TensorFlowJs example",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cimo/TensorFlowJs_example"
+    },
     "dependencies": {
         "express": "4.17.1",
         "pug": "2.0.4",
@@ -12,5 +18,6 @@
         "@tensorflow-models/posenet": "2.2.1",
         "@tensorflow-models/mobilenet": "2.0.4",
         "@tensorflow-models/knn-classifier": "1.2.2"
-    }
+    },
+    "peerDependencies": {}
 }

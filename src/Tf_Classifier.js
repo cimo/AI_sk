@@ -1,6 +1,6 @@
 "use strict";
 
-/* global Uint8Array, __dirname */
+/* global __dirname, Uint8Array */
 
 const fs = require("fs");
 const tensorFlow = require("@tensorflow/tfjs-node");
@@ -42,8 +42,15 @@ exports.execute = async(request, callback) => {
     if (request.params.event === undefined && request.query.event === undefined && request.body.event === undefined) {
         //...
     }
-    else if (request.body.event === "learn") {
-        await learn();
+    else if (request.body.event === "learnFromFile") {
+        await learnFromFile();
+        
+        await writeBrain();
+        
+        response.ajax = true;
+    }
+    else if (request.body.event === "learnFromCamera") {
+        await learnFromCamera(request.body);
         
         await writeBrain();
         
@@ -88,12 +95,11 @@ const writeBrain = () => {
     console.log("Write brain completed.");
 };
 
-const learn = () => {
+const learnFromFile = () => {
     let elements = {};
     
     elements.linux = readImageFile(`${urlRoot}/images/classifier/linux.jpg`);
     elements.windows = readImageFile(`${urlRoot}/images/classifier/windows.jpg`);
-    elements.test = readImageFile(`${urlRoot}/images/classifier/${imageSource}`);
     
     for (const [key, value] of Object.entries(elements)) {
         createClass(value, key);
@@ -101,9 +107,21 @@ const learn = () => {
         createClass(value, key);
     }
     
-    response.messages.success = "Learn completed.";
+    response.messages.success = "Learn from file completed.";
     
-    console.log("Learn completed.");
+    console.log("Learn from file completed.");
+};
+
+const learnFromCamera = (requestBody) => {
+    let image = readImageFile(`${urlRoot}/images/classifier/${imageSource}`);
+    
+    createClass(image, requestBody.label);
+    createClass(image, requestBody.label);
+    createClass(image, requestBody.label);
+    
+    response.messages.success = "Learn from camera completed.";
+    
+    console.log("Learn from camera completed.");
 };
 
 const predictionFromCamera = (dataUrl) => {

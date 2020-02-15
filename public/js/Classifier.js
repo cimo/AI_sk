@@ -12,8 +12,8 @@ class Classifier {
         this.camera = new Camera();
     }
     
-    comunication = () => {
-        this.websocket.getSocketIo.connect(window.location.host);
+    comunication = (address) => {
+        this.websocket.getSocketIo.connect(address);
         
         this.websocket.messageFromServer("prediction_label", "#prediction .label", () => {
             //...
@@ -32,15 +32,40 @@ class Classifier {
     }
     
     eventLogic = () => {
-        $("#command_container").find(".learn_button").on("click", "", (event) => {
-            let learLabel = $("#command_container").find(".learn_label").val();
+        $("#command_container").find(".learn_file_button").on("click", "", (event) => {
+            $.ajax({
+                'url': window.location.href,
+                'method': "post",
+                'data': {
+                    'event': "learnFromFile"
+                },
+                'dataType': "json",
+                'cache': false,
+                'processData': true,
+                'contentType': "application/x-www-form-urlencoded; charset=UTF-8",
+                beforeSend: () => {
+                },
+                success: (xhr) => {
+                    console.log(xhr);
+                },
+                error: (xhr, status) => {
+                    console.log(xhr, status);
+                },
+                complete: () => {
+                }
+            });
+        });
+        
+        $("#command_container").find(".learn_camera_button").on("click", "", (event) => {
+            let learLabel = $("#command_container").find(".learn_camera_label").val();
             
             if (learLabel !== "") {
                 $.ajax({
                     'url': window.location.href,
                     'method': "post",
                     'data': {
-                        'event': "learn"
+                        'event': "learnFromCamera",
+                        'label': learLabel
                     },
                     'dataType': "json",
                     'cache': false,
