@@ -12,10 +12,8 @@ class Classifier {
         this.camera = new Camera();
     }
     
-    comunication = (address) => {
-        this.websocket.getSocketIo.connect(address);
-        
-        this.websocket.messageFromServer("prediction_label", "#prediction .label", () => {
+    comunication = () => {
+        this.websocket.messageFromServer("#prediction .label", "prediction_label", () => {
             //...
         });
         
@@ -46,10 +44,10 @@ class Classifier {
                 beforeSend: () => {
                 },
                 success: (xhr) => {
-                    console.log(xhr);
+                    console.log(xhr.response);
                 },
                 error: (xhr, status) => {
-                    console.log(xhr, status);
+                    console.log(xhr.response, status);
                 },
                 complete: () => {
                 }
@@ -57,15 +55,17 @@ class Classifier {
         });
         
         $("#command_container").find(".learn_camera_button").on("click", "", (event) => {
-            let learLabel = $("#command_container").find(".learn_camera_label").val();
+            let label = $("#command_container").find(".learn_camera_label").val();
+            let base64 = this.camera.getCanvas[0].toDataURL("image/jpeg");
             
-            if (learLabel !== "") {
+            if (label !== "" && base64 !== "") {
                 $.ajax({
                     'url': window.location.href,
                     'method': "post",
                     'data': {
                         'event': "learnFromCamera",
-                        'label': learLabel
+                        'label': label,
+                        'base64': base64
                     },
                     'dataType': "json",
                     'cache': false,
@@ -74,10 +74,10 @@ class Classifier {
                     beforeSend: () => {
                     },
                     success: (xhr) => {
-                        console.log(xhr);
+                        console.log(xhr.response);
                     },
                     error: (xhr, status) => {
-                        console.log(xhr, status);
+                        console.log(xhr.response, status);
                     },
                     complete: () => {
                     }

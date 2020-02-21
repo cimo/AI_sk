@@ -2,6 +2,8 @@
 
 /* global */
 
+const helper = require("./Helper");
+
 let connectionCount = 0;
 
 exports.startup = async(socketIoServer, socket) => {
@@ -11,7 +13,7 @@ exports.startup = async(socketIoServer, socket) => {
 const run = (socketIoServer, socket) => {
     let address = JSON.stringify(socket.handshake.address);
     
-    console.log(`Connection from client: ${address}`);
+    helper.writeLog(`Connection from client: ${address}`);
     
     connectionCount ++;
     
@@ -24,7 +26,7 @@ const run = (socketIoServer, socket) => {
     socket.emit("message", "Connected to server.");
     
     socket.on("disconnect", () => {
-        console.log(`Disconnection from client: ${address}`);
+        helper.writeLog(`Disconnection from client: ${address}`);
         
         connectionCount --;
         

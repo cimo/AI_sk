@@ -36,10 +36,6 @@
             </div>
         </div>
         
-        script.
-            window.prediction = '!{response.prediction}';
-            window.data = '!{response.data}';
-        
         <script src="js/library/jquery_3.4.1.min.js"></script>
         <script src="js/library/socket.io_2.3.0.min.js"></script>
         <script src="js/Websocket.js"></script>
@@ -49,14 +45,16 @@
         script.
             $(document).ready(() => {
                 let websocket = new Websocket();
-
-                websocket.messageFromBroadcast("#ws_container .ws_broadcast");
-                websocket.messageFromServer("serverTime", "#ws_container .ws_serverTime");
-                websocket.messageFromServer("message", "#ws_container .ws_message");
-
+                
+                websocket.getSocketIo.connect("https://lsv2.machine.local");
+                
+                websocket.messageFromServerBroadcast("#ws_container .ws_broadcast");
+                websocket.messageFromServer("#ws_container .ws_serverTime", "serverTime");
+                websocket.messageFromServer("#ws_container .ws_message", "message");
+                
                 let classifier = new Classifier(websocket);
-
-                classifier.comunication("https://lsv2.machine.local");
+                
+                classifier.comunication();
                 classifier.eventLogic();
             });
     </body>

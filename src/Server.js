@@ -30,6 +30,7 @@ const urlRoot = "../public";
 
 let connectionCount = 0;
 
+const helper = require("./Helper");
 const sio_Websocket = require("./Sio_Websocket");
 const tf_KaradaSokutei = require("./Tf_KaradaSokutei");
 const tf_Classifier = require("./Tf_Classifier");
@@ -46,26 +47,26 @@ app.get("/", (request, result) => {
 });
 app.all("/karada_sokutei", (request, result) => {
     tf_KaradaSokutei.execute(request, (response) => {
-        if (response.ajax !== undefined)
-            result.json(response);
+        if (response.ajax === true)
+            result.json({'response': response});
         else
             result.render("karada_sokutei.pug", {'response': response});
     });
 });
 app.all("/classifier", (request, result) => {
     tf_Classifier.execute(request, (response) => {
-        if (response.ajax !== undefined)
-            result.json(response);
+        if (response.ajax === true)
+            result.json({'response': response});
         else
             result.render("classifier.pug", {'response': response});
     });
 });
 
 httpServer.listen(portHttp, () => {
-    console.log(`Listen on ${portHttp}`);
+    helper.writeLog(`Listen on ${portHttp}`);
 });
 httpsServer.listen(portHttps, () => {
-    console.log(`Listen on ${portHttps}`);
+    helper.writeLog(`Listen on ${portHttps}`);
     
     tf_KaradaSokutei.startup();
     

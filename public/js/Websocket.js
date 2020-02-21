@@ -13,18 +13,18 @@ class Websocket {
         this.socketIo = io();
     }
     
-    messageFromBroadcast = (target, callback) => {
+    messageFromServerBroadcast = (tag, callback) => {
         this.socketIo.on("broadcast", (data) => {
-            $(target).text(data);
+            $(tag).text(data);
             
             if (callback !== undefined)
                 callback();
         });
     }
     
-    messageFromServer = (label, target, callback) => {
+    messageFromServer = (tag, label, callback) => {
         this.socketIo.on(label, (data) => {
-            $(target).text(data);
+            $(tag).text(data);
             
             if (callback !== undefined)
                 callback();
@@ -39,7 +39,7 @@ class Websocket {
     }
     
     sendImage = (label, buffer, callback) => {
-        this.socketIo.emit(label, {'image': true, 'buffer': buffer});
+        this.socketIo.emit(label, buffer);
         
         if (callback !== undefined)
             callback();

@@ -2,68 +2,89 @@
 
 /* global */
 
+const fs = require("fs");
+const {Canvas, Image} = require("canvas");
 const tensorFlow = require("@tensorflow/tfjs-node");
 const poseNet = require("@tensorflow-models/posenet");
-const {createCanvas, Image} = require("canvas");
+const helper = require("./Helper");
 
 const urlRoot = "../public";
-
-let resolution = {'width': 640, 'height': 480};
-
-let posenetEntity = null;
 
 let canvas = null;
 let canvasContext = null;
 
+let posenetEntity = null;
+
+let resolution = {'width': 640, 'height': 480};
+
 let response = {
-    'messages': {
-        'success': "",
-        'error': ""
-    }
+    'messages': {},
+    'values': {},
+    'ajax': false
 };
 
 exports.startup = async() => {
+    canvas = new Canvas(resolution.width, resolution.height);
+    canvasContext = canvas.getContext("2d");
+    
     posenetEntity = await poseNet.load({
         'architecture': "ResNet50",
         'outputStride': 32,
         'inputResolution': resolution,
         'quantBytes': 2
     });
-
-    canvas = createCanvas(resolution.width, resolution.height);
-    canvasContext = canvas.getContext("2d");
 };
 
 exports.execute = async(request, callback) => {
     if (request.params.event === undefined && request.query.event === undefined && request.body.event === undefined) {
-        putImageInCanvas(`${urlRoot}/images/karada_sokutei/source.png`);
-        
-        let elements = await findPoseElement();
-        
-        if (elements !== null) {
-            response.canvasDataUrl = canvas.toDataURL("image/jpeg");
-
-            response.elements = JSON.stringify(elements);
+        //...
+    }
+    else if (request.body.event === "findPoint") {
+        if (posenetEntity !== null) {
+            let image = await createImage(`${urlRoot}/images/karada_sokutei/source.png`);
+            
+            canvasContext.drawImage(image, 0, 0);
+            
+            let imageTensor = tensorFlow.browser.fromPixels(canvas);
+            
+            let elements = await findPoseElement(imageTensor);
+            
+            if (elements !== null) {
+                response.values.canvasDataUrl = canvas.toDataURL("image/jpeg");
+                response.values.elements = JSON.stringify(elements);
+            }
         }
+        else
+            response.messages.error = "PoseNet is not ready please retry!";
+        
+        response.ajax = true;
     }
     
     callback(response);
-};
-
-const putImageInCanvas = (path) => {
-    let image = new Image();
     
-    image.onload = () => {
-        canvasContext.drawImage(image, 0, 0);
+    response = {
+        'messages': {},
+        'values': {},
+        'ajax': false
     };
-    
-    image.src = path;
 };
 
-const findPoseElement = async() => {
-    let results = {'position': [], 'distance': []};
+const createImage = async(path) => {
+    let image = null;
     
-    let imageTensor = tensorFlow.browser.fromPixels(canvas);
+    const imageLoadPromise = new Promise(resolve => {
+        image = new Image();
+        image.onload = resolve;
+        image.src = path;
+    });
+    
+    await imageLoadPromise;
+    
+    return image;
+};
+
+const findPoseElement = async(imageTensor) => {
+    let results = {'position': [], 'distance': []};
     
     let pose = await posenetEntity.estimateSinglePose(imageTensor, {
         'flipHorizontal': false

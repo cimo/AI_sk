@@ -1,19 +1,16 @@
 TensorFlowJs example
 ==============
 
-TensorFlowJs code collection.
-WORK IN PROGRESS...
+TensorFlowJs code collection with NodeJs.
 
 | Info: |
 |:---|
-| Pose |
-
-## Images:
-<img src="screenshots/1.png" width="200" alt="1.png"/>
-<img src="screenshots/2.png" width="200" alt="2.png"/>
+| Find body point from image |
+| Learn from webcam and image |
 
 | Library: |
 |:---|
 | TensorFlowJs - https://tensorflow.org/ |
+| Socket.io - https://socket.io/ |
 
 <b>By CIMO - https://reinventsoftware.org</b>
