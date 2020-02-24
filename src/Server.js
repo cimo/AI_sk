@@ -10,6 +10,11 @@ const pug = require("pug");
 const bodyParser = require("body-parser");
 const socketIo = require("socket.io");
 
+const helper = require("./Helper");
+const sio_Websocket = require("./Sio_Websocket");
+const tf_KaradaSokutei = require("./Tf_KaradaSokutei");
+const tf_Classifier = require("./Tf_Classifier");
+
 const app = express();
 
 const certificates = {
@@ -29,11 +34,6 @@ const portHttps = 2443;
 const urlRoot = "../public";
 
 let connectionCount = 0;
-
-const helper = require("./Helper");
-const sio_Websocket = require("./Sio_Websocket");
-const tf_KaradaSokutei = require("./Tf_KaradaSokutei");
-const tf_Classifier = require("./Tf_Classifier");
 
 app.set("views", `${urlRoot}/templates`);
 app.set("view engine", "pug");

@@ -12,7 +12,7 @@ class Classifier {
         this.camera = new Camera();
     }
     
-    comunication = () => {
+    communication = () => {
         this.websocket.messageFromServer("#prediction .label", "prediction_label", () => {
             //...
         });
@@ -25,7 +25,7 @@ class Classifier {
         this.camera.captureCallback(() => {
             let base64 = this.camera.getCanvas[0].toDataURL("image/jpeg");
             
-            this.websocket.sendImage("predictionFromCamera", base64);
+            this.websocket.sendMessage("predictionFromCamera", base64);
         });
     }
     
@@ -58,31 +58,8 @@ class Classifier {
             let label = $("#command_container").find(".learn_camera_label").val();
             let base64 = this.camera.getCanvas[0].toDataURL("image/jpeg");
             
-            if (label !== "" && base64 !== "") {
-                $.ajax({
-                    'url': window.location.href,
-                    'method': "post",
-                    'data': {
-                        'event': "learnFromCamera",
-                        'label': label,
-                        'base64': base64
-                    },
-                    'dataType': "json",
-                    'cache': false,
-                    'processData': true,
-                    'contentType': "application/x-www-form-urlencoded; charset=UTF-8",
-                    beforeSend: () => {
-                    },
-                    success: (xhr) => {
-                        console.log(xhr.response);
-                    },
-                    error: (xhr, status) => {
-                        console.log(xhr.response, status);
-                    },
-                    complete: () => {
-                    }
-                });
-            }
+            if (label !== "" && base64 !== "")
+                this.websocket.sendMessage("learnFromCamera", {'label': label, 'base64': base64});
         });
     }
     

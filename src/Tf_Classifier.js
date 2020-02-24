@@ -7,6 +7,7 @@ const {Canvas, Image} = require("canvas");
 const tensorFlow = require("@tensorflow/tfjs-node");
 const mobileNet = require("@tensorflow-models/mobilenet");
 const knnClassifier = require("@tensorflow-models/knn-classifier");
+
 const helper = require("./Helper");
 
 const urlRoot = "../public";
@@ -35,6 +36,12 @@ exports.socketEvent = async(socket) => {
         if (prediction !== null)
             socket.emit("prediction_label", prediction.label);
     });
+    
+    socket.on("learnFromCamera", async(json) => {
+        await learnFromCamera(json);
+        
+        await writeBrain();
+    });
 };
 
 exports.execute = async(request, callback) => {
@@ -43,13 +50,6 @@ exports.execute = async(request, callback) => {
     }
     else if (request.body.event === "learnFromFile") {
         await learnFromFile();
-        
-        await writeBrain();
-        
-        response.ajax = true;
-    }
-    else if (request.body.event === "learnFromCamera") {
-        await learnFromCamera(request.body);
         
         await writeBrain();
         
@@ -117,13 +117,13 @@ const learnFromFile = () => {
     helper.writeLog("Learn from file completed.");
 };
 
-const learnFromCamera = async(requestBody) => {
-    if (requestBody.base64 !== undefined) {
-        let imageCanvas = await createImageCanvas(requestBody.base64);
+const learnFromCamera = async(json) => {
+    if (json !== undefined) {
+        let imageCanvas = await createImageCanvas(json.base64);
 
-        createClass("canvas", imageCanvas, requestBody.label);
-        createClass("canvas", imageCanvas, requestBody.label);
-        createClass("canvas", imageCanvas, requestBody.label);
+        createClass("canvas", imageCanvas, json.label);
+        createClass("canvas", imageCanvas, json.label);
+        createClass("canvas", imageCanvas, json.label);
 
         response.messages.success = "Learn from camera completed.";
         

@@ -38,12 +38,5 @@ class Websocket {
             callback();
     }
     
-    sendImage = (label, buffer, callback) => {
-        this.socketIo.emit(label, buffer);
-        
-        if (callback !== undefined)
-            callback();
-    }
-    
     // Functions private
 }
