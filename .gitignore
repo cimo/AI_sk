@@ -48,12 +48,7 @@ Temporary Items
 
 # cimo
 nbproject
-/public/.sass-cache
-/src/Config.php
-/var/sessions/*
-!/var/sessions/.gitkeep
-
 /src/node_modules
 /src/package-lock.json
-/src/Config.js.dist
+/src/Config.js
 /src/debug.log
