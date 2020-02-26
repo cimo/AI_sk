@@ -55,4 +55,5 @@ nbproject
 
 /src/node_modules
 /src/package-lock.json
+/src/Config.js.dist
 /src/debug.log

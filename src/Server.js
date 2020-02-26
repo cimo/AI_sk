@@ -10,6 +10,7 @@ const pug = require("pug");
 const bodyParser = require("body-parser");
 const socketIo = require("socket.io");
 
+const config = require("./Config");
 const helper = require("./Helper");
 const sio_Websocket = require("./Sio_Websocket");
 const tf_KaradaSokutei = require("./Tf_KaradaSokutei");
@@ -18,8 +19,8 @@ const tf_Classifier = require("./Tf_Classifier");
 const app = express();
 
 const certificates = {
-    'key': fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.key.insecure"),
-    'cert': fs.readFileSync("/etc/certificates/lsv2.machine.local/Encrypted.crt")
+    'key': fs.readFileSync(config.settings.certificates.key),
+    'cert': fs.readFileSync(config.settings.certificates.cert)
 };
 
 const httpServer = http.createServer(app);
