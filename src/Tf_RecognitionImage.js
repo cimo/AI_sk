@@ -35,7 +35,7 @@ exports.socketEvent = async(socket) => {
         let prediction = await predictionFromCamera(base64);
         
         if (prediction !== null)
-            socket.emit("prediction_label", prediction.label);
+            socket.emit("predictionLabel", prediction.label);
     });
     
     socket.on("learnFromCamera", async(json) => {
@@ -64,7 +64,7 @@ exports.execute = async(request, callback) => {
 
 const readBrain = async() => {
     try {
-        let dataset = JSON.parse(fs.readFileSync(`${urlRoot}/files/classifier/brain.json`));
+        let dataset = JSON.parse(fs.readFileSync(`${urlRoot}/files/recognition_image/brain.json`));
         let datasetResult = {};
         
         for (const [key, value] of Object.entries(dataset)) {
@@ -90,13 +90,13 @@ const writeBrain = () => {
         datasetResult[key] = Array.from(value.dataSync());
     }
     
-    fs.writeFileSync(`${urlRoot}/files/classifier/brain.json`, JSON.stringify(datasetResult));
+    fs.writeFileSync(`${urlRoot}/files/recognition_image/brain.json`, JSON.stringify(datasetResult));
     
     helper.writeLog("Write brain completed.");
 };
 
 const learnFromFile = () => {
-    let data = fs.readFileSync(`${urlRoot}/files/classifier/learn.zip`);
+    let data = fs.readFileSync(`${urlRoot}/files/recognition_image/learn.zip`);
     
     if (data !== false) {
         let zip = new JsZip();

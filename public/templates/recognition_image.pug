@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Recognition image</title>
+        
+        <!-- Meta -->
+        <meta charset="UTF-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=1">
+        <meta name="description" content="..."/>
+        <meta name="keywords" content="..."/>
+        <meta name="robots" content="index, follow"/>
+        
+        <!-- Favicon -->
+        <link href="images/favicon.ico" rel="icon" type="image/x-icon">
+        
+        <!-- Css -->
+        <link href="css/recognition_image.css" rel="stylesheet"/>
+    </head>
+    <body>
+        <div id="main_container">
+            include include/websocket.pug
+            
+            include include/camera.pug
+            
+            <div id="command_container">
+                <div>
+                    <button class="start_capture" type="button">Start capture</button>
+                    <button class="stop_capture" type="button">Stop capture</button>
+                </div>
+                <div>
+                    <button class="learn_file_button" type="button">Learn from file</button>
+                </div>
+                <div>
+                    <input class="learn_camera_label" name="learnFromCameraLabel" value=""/>
+                    <button class="learn_camera_button" type="button">Learn from camera</button>
+                </div>
+            </div>
+            
+            <div id="prediction">
+                <p class="text"></p>
+                <p class="label"></p>
+            </div>
+        </div>
+        
+        <script src="js/library/jquery_3.4.1.min.js"></script>
+        <script src="js/library/socket.io_2.3.0.min.js"></script>
+        <script src="js/Websocket.js"></script>
+        <script src="js/Camera.js"></script>
+        <script src="js/RecognitionImage.js"></script>
+        
+        script.
+            $(document).ready(() => {
+                let websocket = new Websocket();
+                
+                websocket.getSocketIo.connect("https://lsv2.machine.local");
+                
+                websocket.messageFromServerBroadcast("#ws_container .ws_broadcast");
+                websocket.messageFromServer("#ws_container .ws_serverTime", "serverTime");
+                websocket.messageFromServer("#ws_container .ws_message", "message");
+                
+                let recognitionImage = new RecognitionImage(websocket);
+                
+                recognitionImage.communication();
+                recognitionImage.eventLogic();
+            });
+    </body>
+</html>

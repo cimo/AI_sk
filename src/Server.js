@@ -14,7 +14,7 @@ const config = require("./Config");
 const helper = require("./Helper");
 const sio_Websocket = require("./Sio_Websocket");
 const tf_KaradaSokutei = require("./Tf_KaradaSokutei");
-const tf_Classifier = require("./Tf_Classifier");
+const tf_RecognitionImage = require("./Tf_RecognitionImage");
 
 const app = express();
 
@@ -54,12 +54,20 @@ app.all("/karada_sokutei", (request, result) => {
             result.render("karada_sokutei.pug", {'response': response});
     });
 });
-app.all("/classifier", (request, result) => {
-    tf_Classifier.execute(request, (response) => {
+app.all("/recognition_image", (request, result) => {
+    tf_RecognitionImage.execute(request, (response) => {
         if (response.ajax === true)
             result.json({'response': response});
         else
-            result.render("classifier.pug", {'response': response});
+            result.render("recognition_image.pug", {'response': response});
+    });
+});
+app.all("/recognition_sound", (request, result) => {
+    tf_RecognitionImage.execute(request, (response) => {
+        if (response.ajax === true)
+            result.json({'response': response});
+        else
+            result.render("recognition_sound.pug", {'response': response});
     });
 });
 
@@ -71,7 +79,7 @@ httpsServer.listen(portHttps, () => {
     
     tf_KaradaSokutei.startup();
     
-    tf_Classifier.startup();
+    tf_RecognitionImage.startup();
 });
 
 socketIoServer.on("connection", (socket) => {
@@ -80,5 +88,5 @@ socketIoServer.on("connection", (socket) => {
 socketIosServer.on("connection", (socket) => {
     sio_Websocket.startup(socketIosServer, socket);
     
-    tf_Classifier.socketEvent(socket);
+    tf_RecognitionImage.socketEvent(socket);
 });

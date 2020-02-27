@@ -2,7 +2,7 @@
 
 /* global */
 
-class Classifier {
+class RecognitionImage {
     // Properties
     
     // Functions public
@@ -13,16 +13,16 @@ class Classifier {
     }
     
     communication = () => {
-        this.websocket.messageFromServer("#prediction .label", "prediction_label", () => {
+        this.websocket.messageFromServer("#prediction .label", "predictionLabel", () => {
             //...
         });
         
         this.camera.setIsMobile = false;
-        this.camera.canvasSetting(320, 180);
+        this.camera.setting(320, 180);
         this.camera.createVideo();
         this.camera.eventLogic();
         
-        this.camera.captureCallback(() => {
+        this.camera.captureVideoCallback(() => {
             let base64 = this.camera.getCanvas[0].toDataURL("image/jpeg");
             
             this.websocket.sendMessage("predictionFromCamera", base64);
@@ -30,6 +30,14 @@ class Classifier {
     }
     
     eventLogic = () => {
+        $("#command_container").find(".start_capture").on("click", "", (event) => {
+            this.camera.startCaptureVideo();
+        });
+        
+        $("#command_container").find(".stop_capture").on("click", "", (event) => {
+            this.camera.stopCaptureVideo();
+        });
+        
         $("#command_container").find(".learn_file_button").on("click", "", (event) => {
             $.ajax({
                 'url': window.location.href,

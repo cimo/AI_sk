@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Classifier</title>
+        <title>Recognition sound</title>
         
         <!-- Meta -->
         <meta charset="UTF-8"/>
@@ -13,6 +13,9 @@
         
         <!-- Favicon -->
         <link href="images/favicon.ico" rel="icon" type="image/x-icon">
+        
+        <!-- Css -->
+        <link href="css/recognition_sound.css" rel="stylesheet"/>
     </head>
     <body>
         <div id="main_container">
@@ -22,11 +25,8 @@
             
             <div id="command_container">
                 <div>
-                    <button class="learn_file_button" type="button">Learn from file</button>
-                </div>
-                <div>
-                    <input class="learn_camera_label" name="learnFromCameraLabel" value=""/>
-                    <button class="learn_camera_button" type="button">Learn from camera</button>
+                    <button class="start_capture" type="button">Start capture</button>
+                    <button class="stop_capture" type="button">Stop capture</button>
                 </div>
             </div>
             
@@ -40,7 +40,7 @@
         <script src="js/library/socket.io_2.3.0.min.js"></script>
         <script src="js/Websocket.js"></script>
         <script src="js/Camera.js"></script>
-        <script src="js/Classifier.js"></script>
+        <script src="js/RecognitionSound.js"></script>
         
         script.
             $(document).ready(() => {
@@ -52,10 +52,10 @@
                 websocket.messageFromServer("#ws_container .ws_serverTime", "serverTime");
                 websocket.messageFromServer("#ws_container .ws_message", "message");
                 
-                let classifier = new Classifier(websocket);
+                let recognitionSound = new RecognitionSound(websocket);
                 
-                classifier.communication();
-                classifier.eventLogic();
+                recognitionSound.communication();
+                recognitionSound.eventLogic();
             });
     </body>
 </html>
