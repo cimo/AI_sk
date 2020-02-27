@@ -4,6 +4,7 @@
 
 const fs = require("fs");
 const {Canvas, Image} = require("canvas");
+const JsZip = require("jszip");
 const tensorFlow = require("@tensorflow/tfjs-node");
 const mobileNet = require("@tensorflow-models/mobilenet");
 const knnClassifier = require("@tensorflow-models/knn-classifier");
@@ -39,8 +40,6 @@ exports.socketEvent = async(socket) => {
     
     socket.on("learnFromCamera", async(json) => {
         await learnFromCamera(json);
-        
-        await writeBrain();
     });
 };
 
@@ -49,9 +48,7 @@ exports.execute = async(request, callback) => {
         //...
     }
     else if (request.body.event === "learnFromFile") {
-        await learnFromFile();
-        
-        await writeBrain();
+        learnFromFile();
         
         response.ajax = true;
     }
@@ -67,7 +64,7 @@ exports.execute = async(request, callback) => {
 
 const readBrain = async() => {
     try {
-        let dataset = JSON.parse(fs.readFileSync(`${urlRoot}/files/brain.json`));
+        let dataset = JSON.parse(fs.readFileSync(`${urlRoot}/files/classifier/brain.json`));
         let datasetResult = {};
         
         for (const [key, value] of Object.entries(dataset)) {
@@ -79,8 +76,6 @@ const readBrain = async() => {
         helper.writeLog("Read brain completed.");
     }
     catch (error) {
-        helper.writeLog(`Read brain error -> ${error}`);
-        
         await writeBrain();
         
         await readBrain();
@@ -95,37 +90,55 @@ const writeBrain = () => {
         datasetResult[key] = Array.from(value.dataSync());
     }
     
-    fs.writeFileSync(`${urlRoot}/files/brain.json`, JSON.stringify(datasetResult));
+    fs.writeFileSync(`${urlRoot}/files/classifier/brain.json`, JSON.stringify(datasetResult));
     
     helper.writeLog("Write brain completed.");
 };
 
 const learnFromFile = () => {
-    let elements = {};
+    let data = fs.readFileSync(`${urlRoot}/files/classifier/learn.zip`);
     
-    elements.linux = readImageFile(`${urlRoot}/images/classifier/linux.jpg`);
-    elements.windows = readImageFile(`${urlRoot}/images/classifier/windows.jpg`);
-    
-    for (const [key, value] of Object.entries(elements)) {
-        createClass("file", value, key);
-        createClass("file", value, key);
-        createClass("file", value, key);
+    if (data !== false) {
+        let zip = new JsZip();
+        
+        zip.loadAsync(data).then((contents) => {
+            for (const [key, value] of Object.entries(contents.files)) {
+                if (value.dir === false) {
+                    let hiddenFile = value.name.substring(0, 2);
+                    
+                    if (hiddenFile !== "__") {
+                        zip.file(value.name).async("nodebuffer").then((buffer) => {
+                            createClass("file", buffer, key);
+                            createClass("file", buffer, key);
+                            createClass("file", buffer, key);
+                            
+                            writeBrain();
+                        });
+                    }
+                }
+            }
+        });
+        
+        response.messages.success = "Learn from file completed.";
+        
+        helper.writeLog("Learn from file completed.");
     }
-    
-    response.messages.success = "Learn from file completed.";
-    
-    helper.writeLog("Learn from file completed.");
+    else {
+        response.messages.error = "Learn from file not completed!";
+        
+        helper.writeLog("Learn from file not completed!");
+    }
 };
 
 const learnFromCamera = async(json) => {
     if (json !== undefined) {
         let imageCanvas = await createImageCanvas(json.base64);
-
+        
         createClass("canvas", imageCanvas, json.label);
         createClass("canvas", imageCanvas, json.label);
         createClass("canvas", imageCanvas, json.label);
-
-        response.messages.success = "Learn from camera completed.";
+        
+        writeBrain();
         
         helper.writeLog("Learn from camera completed.");
     }
@@ -170,13 +183,6 @@ const createImageCanvas = async(buffer) => {
     return canvas;
 };
 
-const readImageFile = (path) => {
-    let data = fs.readFileSync(path);
-    let arrayByte = Uint8Array.from(Buffer.from(data));
-    
-    return arrayByte;
-};
-
 const createClass = (type, image, label) => {
     let imageTensor = null;
     
@@ -191,4 +197,11 @@ const createClass = (type, image, label) => {
     
     if (label !== undefined)
         knnClassifierEntity.addExample(classification, label);
+};
+
+const readImageFile = (path) => {
+    let data = fs.readFileSync(path);
+    let arrayByte = Uint8Array.from(Buffer.from(data));
+    
+    return arrayByte;
 };
