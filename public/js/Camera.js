@@ -33,8 +33,8 @@ class Camera {
         
         this.audio = null;
         this.sourceAudio = null;
-        this.audioChunk = [];
         this.isAudio = false;
+        this.audioChunk = [];
         
         this.timeoutAudioEvent = null;
         
@@ -159,14 +159,6 @@ class Camera {
     }
     
     eventLogic = () => {
-        this.sourceVideo.on("change", "", (event) => {
-            this.startCaptureVideo();
-        });
-        
-        this.sourceAudio.on("change", "", (event) => {
-            this.startCaptureAudio();
-        });
-        
         this.reset.on("click", "", (event) => {
             this.isRegenerate = true;
             
@@ -175,17 +167,13 @@ class Camera {
                 
                 this.createVideo();
             }
-            else if (this.isAudio === true) {
+            
+            if (this.isAudio === true) {
                 this.sourceAudio.val(0);
                 
                 this.createAudio();
             }
         });
-    }
-    
-    captureVideoCallback = (callback) => {
-        if (callback !== undefined)
-            this.captureVideoEvent = callback;
     }
     
     startCaptureVideo = () => {
@@ -204,9 +192,9 @@ class Camera {
         this.resetVideo();
     }
     
-    captureAudioCallback = (callback) => {
+    captureVideoCallback = (callback) => {
         if (callback !== undefined)
-            this.captureAudioEvent = callback;
+            this.captureVideoEvent = callback;
     }
     
     startCaptureAudio = () => {
@@ -223,6 +211,11 @@ class Camera {
     
     stopCaptureAudio = () => {
         this.resetAudio();
+    }
+    
+    captureAudioCallback = (callback) => {
+        if (callback !== undefined)
+            this.captureAudioEvent = callback;
     }
     
     // Functions private
@@ -254,7 +247,8 @@ class Camera {
                 
                 this.sourceVideo.append(`<option value="${value.deviceId}">${label}</option>`);
             }
-            else if (this.isAudio === true && value.kind === "audioinput") {
+            
+            if (this.isAudio === true && value.kind === "audioinput") {
                 audioCount ++;
                 
                 let label = value.label === "" ? `Audio ${audioCount}` : value.label;
@@ -280,7 +274,8 @@ class Camera {
             
             this.intervalVideoEvent = setInterval(this.captureVideo, this.captureVideoTime);
         }
-        else if (this.isAudio === true) {
+        
+        if (this.isAudio === true) {
             this.recorder = new MediaRecorder(stream);
             
             this.recorder.ondataavailable = event => {
@@ -331,15 +326,11 @@ class Camera {
         }
     }
     
-    errorEvent = (event) => {
-        //console.log(`errorEvent: ${event}`);
-    }
-    
     resetVideo = () => {
-        clearInterval(this.intervalVideoEvent);
-        
         if (this.stream !== null)
             this.stream.getVideoTracks()[0].stop();
+        
+        clearInterval(this.intervalVideoEvent);
     }
     
     resetAudio = () => {
@@ -351,5 +342,9 @@ class Camera {
             
             this.recorder.stop();
         }
+    }
+    
+    errorEvent = (event) => {
+        //console.log(`errorEvent: ${event}`);
     }
 }
