@@ -10,7 +10,7 @@ TensorFlowJs code collection with NodeJs.
 
 | Library: |
 |:---|
-| TensorFlowJs - https://tensorflow.org/ |
-| Socket.io - https://socket.io/ |
+| TensorFlowJs - https://tensorflow.org |
+| Socket.io - https://socket.io |
 
 <b>By CIMO - https://reinventsoftware.org</b>
