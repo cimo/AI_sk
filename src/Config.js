@@ -8,6 +8,7 @@ exports.settings = {
         'cert': "/etc/certificates/lsv2.machine.local/Encrypted.crt"
     },
     'digest': {
+        'enable': false,
         'path': "/home/cimo/www"
     }
 };
