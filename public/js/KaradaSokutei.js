@@ -29,9 +29,9 @@ class KaradaSokutei {
                     if (xhr.response.messages.error !== undefined)
                         $("#info").html(xhr.response.messages.error);
                     else if (xhr.response.values.canvasDataUrl !== undefined) {
-                        this.createImageFromCanvas(xhr.response);
-                        this.showPosition(xhr.response);
-                        this.showDistance(xhr.response, "Distance from leftEye to rightEye are: ");
+                        this._createImageFromCanvas(xhr.response);
+                        this._showPosition(xhr.response);
+                        this._showDistance(xhr.response, "Distance from leftEye to rightEye are: ");
                     }
                 },
                 error: (xhr, status) => {
@@ -44,13 +44,13 @@ class KaradaSokutei {
     }
     
     // Functions private
-    createImageFromCanvas = (response) => {
+    _createImageFromCanvas = (response) => {
         $("#image").html("");
         
         $("#image").attr("src", response.values.canvasDataUrl);
     }
     
-    showPosition = (response) => {
+    _showPosition = (response) => {
         $("#position").html("");
         
         let elements = JSON.parse(response.values.elements);
@@ -62,10 +62,10 @@ class KaradaSokutei {
         }); 
     }
     
-    showDistance = (response, message) => {
+    _showDistance = (response, message) => {
         let elements = JSON.parse(response.values.elements);
         
-        let dpi = this.screenDpi();
+        let dpi = this._screenDpi();
         
         let distance = (elements.distance / dpi) * 2.54;
         
@@ -73,7 +73,7 @@ class KaradaSokutei {
         $("#distance").append(`<li>${message} ${distance.toFixed(2)} cm.</li>`);
     }
     
-    screenDpi = () => {
+    _screenDpi = () => {
         let element = $("<div></div>");
         element.css("width", "1in");
         

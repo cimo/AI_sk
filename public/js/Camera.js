@@ -93,22 +93,22 @@ class Camera {
         if (this.video[0] !== undefined) {
             this.isVideo = true;
             
-            this.resetVideo();
+            this._resetVideo();
 
             if (navigator.mediaDevices) {
                 navigator.mediaDevices.enumerateDevices().then((devices) => {
-                    this.deviceEvent(devices);
+                    this._deviceEvent(devices);
                 }).catch((error) => {
-                    this.errorEvent(error);
+                    this._errorEvent(error);
                 });
             }
             else {
                 let mode = navigator.getUserMedia() || navigator.webkitGetUserMedia() || navigator.mozGetUserMedia() || navigator.msGetUserMedia;
 
                 mode({'video': true, 'audio': false}).then((stream) => {
-                    this.successEvent(stream);
+                    this._successEvent(stream);
                 }).catch((error) => {
-                    this.errorEvent(error);
+                    this._errorEvent(error);
                 });
             }
         }
@@ -120,22 +120,22 @@ class Camera {
         if (this.audio[0] !== undefined) {
             this.isAudio = true;
             
-            this.resetAudio();
+            this._resetAudio();
 
             if (navigator.mediaDevices) {
                 navigator.mediaDevices.enumerateDevices().then((devices) => {
-                    this.deviceEvent(devices);
+                    this._deviceEvent(devices);
                 }).catch((error) => {
-                    this.errorEvent(error);
+                    this._errorEvent(error);
                 });
             }
             else {
                 let mode = navigator.getUserMedia() || navigator.webkitGetUserMedia() || navigator.mozGetUserMedia() || navigator.msGetUserMedia;
 
                 mode({'video': false, 'audio': true}).then((stream) => {
-                    this.successEvent(stream);
+                    this._successEvent(stream);
                 }).catch((error) => {
-                    this.errorEvent(error);
+                    this._errorEvent(error);
                 });
             }
         }
@@ -204,20 +204,20 @@ class Camera {
     
     startCaptureVideo = () => {
         if (this.sourceVideo.val() !== "0") {
-            this.resetVideo();
+            this._resetVideo();
 
             $(this.video).show();
 
             navigator.mediaDevices.getUserMedia(this.userMedia).then((stream) => {
-                this.successEvent(stream);
+                this._successEvent(stream);
             }).catch((error) => {
-                this.errorEvent(error);
+                this._errorEvent(error);
             });
         }
     }
     
     stopCaptureVideo = () => {
-        this.resetVideo();
+        this._resetVideo();
 
         $(this.video).hide();
     }
@@ -229,20 +229,20 @@ class Camera {
     
     startCaptureAudio = () => {
         if (this.sourceAudio.val() !== "0") {
-            this.resetAudio();
+            this._resetAudio();
 
             $(this.audio).hide();
 
             navigator.mediaDevices.getUserMedia(this.userMedia).then((stream) => {
-                this.successEvent(stream);
+                this._successEvent(stream);
             }).catch((error) => {
-                this.errorEvent(error);
+                this._errorEvent(error);
             });
         }
     }
     
     stopCaptureAudio = () => {
-        this.resetAudio();
+        this._resetAudio();
 
         $(this.audio).hide();
     }
@@ -253,7 +253,7 @@ class Camera {
     }
     
     // Functions private
-    deviceEvent = (devices) => {
+    _deviceEvent = (devices) => {
         this.videoOptions = {
             'video_0': false
         };
@@ -299,7 +299,7 @@ class Camera {
         this.isReset = false;
     }
     
-    successEvent = (stream) => {
+    _successEvent = (stream) => {
         this.stream = stream;
         
         if (this.isVideo === true) {
@@ -307,7 +307,7 @@ class Camera {
             this.video[0].controls = false;
             this.video[0].autoplay = true;
 
-            this.intervalVideoEvent = setInterval(this.captureVideo, this.captureVideoTime);
+            this.intervalVideoEvent = setInterval(this._captureVideo, this.captureVideoTime);
         }
         
         if (this.isAudio === true) {
@@ -325,11 +325,11 @@ class Camera {
                 }
             };
             
-            this.captureAudio();
+            this._captureAudio();
         }
     }
     
-    captureVideo = () => {
+    _captureVideo = () => {
         try {
             this.canvasContext.drawImage(this.video[0], 0, 0, this.canvas[0].width, this.canvas[0].height);
             
@@ -337,15 +337,15 @@ class Camera {
                 this.captureVideoEvent();
         }
         catch(error) {
-            this.errorEvent(error);
+            this._errorEvent(error);
             
-            this.timeoutVideoEvent = setTimeout(this.captureVideo, this.captureVideoTime);
+            this.timeoutVideoEvent = setTimeout(this._captureVideo, this.captureVideoTime);
             
             clearTimeout(this.timeoutVideoEvent);
         }
     }
     
-    captureAudio = () => {
+    _captureAudio = () => {
         try {
             this.recorder.start();
             
@@ -353,15 +353,15 @@ class Camera {
                 this.captureAudioEvent();
         }
         catch(error) {
-            this.errorEvent(error);
+            this._errorEvent(error);
             
-            this.timeoutAudioEvent = setTimeout(this.captureAudio, this.captureAudioTime);
+            this.timeoutAudioEvent = setTimeout(this._captureAudio, this.captureAudioTime);
             
             clearTimeout(this.timeoutAudioEvent);
         }
     }
     
-    resetVideo = () => {
+    _resetVideo = () => {
         if (this.stream !== null) {
             this.stream.getVideoTracks()[0].stop();
 
@@ -372,7 +372,7 @@ class Camera {
         clearInterval(this.intervalVideoEvent);
     }
     
-    resetAudio = () => {
+    _resetAudio = () => {
         if (this.stream !== null) {
             this.stream.getAudioTracks()[0].stop();
 
@@ -387,7 +387,7 @@ class Camera {
         }
     }
     
-    errorEvent = (event) => {
+    _errorEvent = (event) => {
         //console.log(`errorEvent: ${event}`);
     }
 }
