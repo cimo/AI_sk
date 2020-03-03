@@ -48,7 +48,7 @@ Temporary Items
 
 # cimo
 nbproject
-/src/node_modules
-/src/package-lock.json
-/src/Config.js
-/src/debug.log
+src/node_modules
+src/package-lock.json
+src/Config.js
+src/debug.log
