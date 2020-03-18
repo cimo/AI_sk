@@ -14,83 +14,74 @@ class Camera {
     
     // Functions public
     constructor() {
-        this.userMedia = {};
-        this.stream = null;
-
-        this.cameraContainer = null;
+        this.cameraContainerTag = "";
 
         this.sourceContainer = null;
-
         this.canvas = null;
         this.canvasContext = null;
-        
-        this.video = null;
-        this.videoOptions = {};
-        this.sourceVideo = null;
-        this.isVideo = false;
-        
-        this.intervalVideoEvent = null;
-        this.timeoutVideoEvent = null;
-        
-        this.captureVideoTime = 1000 / 3;
-        this.captureVideoEvent = null;
-        
-        this.audio = null;
-        this.audioOptions = {};
-        this.sourceAudio = null;
-        this.isAudio = false;
-        this.audioChunk = [];
-
-        this.timeoutAudioEvent = null;
-        
-        this.captureAudioTime = 1000 / 3;
-        this.captureAudioEvent = null;
-
         this.resetButton = null;
 
+        this.video = null;
+        this.videoOptions = {};
+        this.videoSource = null;
+        this.isVideo = false;
+
+        this.intervalVideoEvent = null;
+        this.captureVideoTime = 1000 / 3;
+        this.captureVideoEvent = null;
+
+        this.audio = null;
+        this.audioOptions = {};
+        this.audioSource = null;
+        this.isAudio = false;
+
+        this.stream = null;
         this.recorder = null;
+        this.audioChunk = [];
+
+        this.captureAudioEvent = null;
+
+        this.userMediaElements = {};
 
         this.isReset = false;
         this.isMobile = false;
     }
     
     setting = (width, height) => {
-        this.cameraContainer = $("#camera_container");
+        this.cameraContainerTag = "#camera_container";
 
-        this.sourceContainer = $(this.cameraContainer).find(".source_container");
+        this.sourceContainer = $(this.cameraContainerTag).find(".source_container");
+        this.canvas = $(this.cameraContainerTag).find("canvas");
+        this.resetButton = $(this.cameraContainerTag).find(".reset");
+        
+        this.video = $(this.cameraContainerTag).find("video");
+        this.videoSource = $(this.cameraContainerTag).find(".video_source");
+        
+        this.audio = $(this.cameraContainerTag).find("audio");
+        this.audioSource = $(this.cameraContainerTag).find(".audio_source");
 
-        this.canvas = $(this.cameraContainer).find(".camera canvas");
-        
-        this.video = $(this.cameraContainer).find(".camera video");
-        this.sourceVideo = $(this.cameraContainer).find(".source_video");
-        
-        this.audio = $(this.cameraContainer).find(".camera audio");
-        this.sourceAudio = $(this.cameraContainer).find(".source_audio");
-        
-        this.resetButton = $(this.cameraContainer).find(".reset");
-        
         if (width !== undefined && height !== undefined) {
             if (this.sourceContainer !== undefined) {
-                this.sourceContainer.width(width);
-                this.sourceContainer.height(height);
+                $(this.sourceContainer).width(width);
+                $(this.sourceContainer).height(height);
             }
 
-            if (this.canvas[0] !== undefined) {
-                this.canvas.width(width);
-                this.canvas.height(height);
+            if (this.canvas !== undefined) {
+                $(this.canvas).width(width);
+                $(this.canvas).height(height);
 
                 this.canvasContext = this.canvas[0].getContext("2d");
             }
 
             if (this.video !== undefined) {
-                this.video.width(width);
-                this.video.height(height);
+                $(this.video).width(width);
+                $(this.video).height(height);
             }
         }
     }
     
     createVideo = () => {
-        if (this.video[0] !== undefined) {
+        if (this.video !== undefined) {
             this.isVideo = true;
             
             this._resetVideo();
@@ -102,22 +93,13 @@ class Camera {
                     this._errorEvent(error);
                 });
             }
-            else {
-                let mode = navigator.getUserMedia() || navigator.webkitGetUserMedia() || navigator.mozGetUserMedia() || navigator.msGetUserMedia;
-
-                mode({'video': true, 'audio': false}).then((stream) => {
-                    this._successEvent(stream);
-                }).catch((error) => {
-                    this._errorEvent(error);
-                });
-            }
         }
         else
             this.isVideo = false;
     }
     
     createAudio = () => {
-        if (this.audio[0] !== undefined) {
+        if (this.audio !== undefined) {
             this.isAudio = true;
             
             this._resetAudio();
@@ -129,65 +111,56 @@ class Camera {
                     this._errorEvent(error);
                 });
             }
-            else {
-                let mode = navigator.getUserMedia() || navigator.webkitGetUserMedia() || navigator.mozGetUserMedia() || navigator.msGetUserMedia;
-
-                mode({'video': false, 'audio': true}).then((stream) => {
-                    this._successEvent(stream);
-                }).catch((error) => {
-                    this._errorEvent(error);
-                });
-            }
         }
         else
             this.isAudio = false;
     }
     
     resize = () => {
-        let width = $(this.cameraContainer).width();
+        let width = $(this.cameraContainerTag).width();
         let height = width / 2.031;
         
         if (this.sourceContainer !== undefined) {
-            this.sourceContainer.width(width);
-            this.sourceContainer.height(height);
+            $(this.sourceContainer).width(width);
+            $(this.sourceContainer).height(height);
         }
         
-        if (this.canvas[0] !== undefined) {
-            this.canvas.width(width);
-            this.canvas.height(height);
+        if (this.canvas !== undefined) {
+            $(this.canvas).width(width);
+            $(this.canvas).height(height);
             
             this.canvasContext = this.canvas[0].getContext("2d");
         }
         
         if (this.video !== undefined) {
-            this.video.width(width);
-            this.video.height(height);
+            $(this.video).width(width);
+            $(this.video).height(height);
         }
     }
     
     eventLogic = () => {
-        this.sourceVideo.on("change", "", (event) => {
+        $(this.videoSource).on("change", "", (event) => {
             let index = $(event.target).val();
 
             if (this.isMobile === true)
                 this.videoOptions[`video_${index}`].facingMode = {'facingMode': "user"};
 
-            this.userMedia = {'video': this.videoOptions[`video_${index}`], 'audio': this.audioOptions['audio_1']};
+            this.userMediaElements = {'video': this.videoOptions[`video_${index}`], 'audio': this.audioOptions['audio_1']};
         });
 
-        this.sourceAudio.on("change", "", (event) => {
+        $(this.audioSource).on("change", "", (event) => {
             let index = $(event.target).val();
 
-            this.userMedia = {'video': this.videoOptions['video_1'], 'audio': this.audioOptions[`audio_${index}`]};
+            this.userMediaElements = {'video': this.videoOptions['video_1'], 'audio': this.audioOptions[`audio_${index}`]};
         });
 
-        this.resetButton.on("click", "", (event) => {
+        $(this.resetButton).on("click", "", (event) => {
             this.isReset = true;
 
             if (this.isVideo === true) {
                 $(this.video).hide();
 
-                this.sourceVideo.val(0);
+                $(this.videoSource).val(0);
 
                 this.createVideo();
             }
@@ -195,7 +168,7 @@ class Camera {
             if (this.isAudio === true) {
                 $(this.audio).hide();
 
-                this.sourceAudio.val(0);
+                $(this.audioSource).val(0);
 
                 this.createAudio();
             }
@@ -203,12 +176,12 @@ class Camera {
     }
     
     startCaptureVideo = () => {
-        if (this.sourceVideo.val() !== "0") {
+        if ($(this.videoSource).val() !== "0") {
             this._resetVideo();
 
             $(this.video).show();
 
-            navigator.mediaDevices.getUserMedia(this.userMedia).then((stream) => {
+            navigator.mediaDevices.getUserMedia(this.userMediaElements).then((stream) => {
                 this._successEvent(stream);
             }).catch((error) => {
                 this._errorEvent(error);
@@ -228,12 +201,12 @@ class Camera {
     }
     
     startCaptureAudio = () => {
-        if (this.sourceAudio.val() !== "0") {
+        if ($(this.audioSource).val() !== "0") {
             this._resetAudio();
 
             $(this.audio).hide();
 
-            navigator.mediaDevices.getUserMedia(this.userMedia).then((stream) => {
+            navigator.mediaDevices.getUserMedia(this.userMediaElements).then((stream) => {
                 this._successEvent(stream);
             }).catch((error) => {
                 this._errorEvent(error);
@@ -265,9 +238,9 @@ class Camera {
         let audioCount = 0;
         
         if (this.isReset === true) {
-            this.sourceVideo.find("option:gt(0)").remove();
-            
-            this.sourceAudio.find("option:gt(0)").remove();
+            $(this.videoSource).find("option:gt(0)").remove();
+
+            $(this.audioSource).find("option:gt(0)").remove();
         }
 
         $.each(devices, (key, value) => {
@@ -279,8 +252,8 @@ class Camera {
                 let facingMode = {'facingMode': "environment"};
 
                 this.videoOptions[`video_${videoCount}`] = {'deviceId': {'exact': value.deviceId}, facingMode};
-                
-                this.sourceVideo.append(`<option value="${videoCount}">${label}</option>`);
+
+                $(this.videoSource).append(`<option value="${videoCount}">${label}</option>`);
             }
             
             if (this.isAudio === true && value.kind === "audioinput") {
@@ -289,12 +262,12 @@ class Camera {
                 let label = value.label === "" ? `Audio ${audioCount}` : value.label;
 
                 this.audioOptions[`audio_${audioCount}`] = {'deviceId': {'exact': value.deviceId}};
-                
-                this.sourceAudio.append(`<option value="${audioCount}">${label}</option>`);
+
+                $(this.audioSource).append(`<option value="${audioCount}">${label}</option>`);
             }
         });
 
-        this.userMedia = {'video': this.videoOptions['video_1'], 'audio': this.audioOptions['audio_1']};
+        this.userMediaElements = {'video': this.videoOptions['video_1'], 'audio': this.audioOptions['audio_1']};
         
         this.isReset = false;
     }
@@ -330,37 +303,14 @@ class Camera {
     }
     
     _captureVideo = () => {
-        try {
+        if (this.video[0] !== null) {
             this.canvasContext.drawImage(this.video[0], 0, 0, this.canvas[0].width, this.canvas[0].height);
-            
+
             if (this.captureVideoEvent !== null)
                 this.captureVideoEvent();
         }
-        catch(error) {
-            this._errorEvent(error);
-            
-            this.timeoutVideoEvent = setTimeout(this._captureVideo, this.captureVideoTime);
-            
-            clearTimeout(this.timeoutVideoEvent);
-        }
     }
-    
-    _captureAudio = () => {
-        try {
-            this.recorder.start();
-            
-            if (this.captureAudioEvent !== null)
-                this.captureAudioEvent();
-        }
-        catch(error) {
-            this._errorEvent(error);
-            
-            this.timeoutAudioEvent = setTimeout(this._captureAudio, this.captureAudioTime);
-            
-            clearTimeout(this.timeoutAudioEvent);
-        }
-    }
-    
+
     _resetVideo = () => {
         if (this.stream !== null) {
             this.stream.getVideoTracks()[0].stop();
@@ -368,8 +318,17 @@ class Camera {
             this.video[0].pause();
             this.video[0].currentTime = 0;
         }
-        
+
         clearInterval(this.intervalVideoEvent);
+    }
+    
+    _captureAudio = () => {
+        if (this.recorder !== null) {
+            this.recorder.start();
+
+            if (this.captureAudioEvent !== null)
+                this.captureAudioEvent();
+        }
     }
     
     _resetAudio = () => {

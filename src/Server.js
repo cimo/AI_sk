@@ -3,6 +3,7 @@
 /* global __dirname */
 
 const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const http = require("http");
 const https = require("https");
@@ -38,7 +39,7 @@ const socketIosServer = socketIo(httpsServer);
 const portHttp = 2080;
 const portHttps = 2443;
 
-const urlRoot = "../public";
+const urlRoot = `${path.dirname(__dirname)}/public`;
 
 app.set("views", `${urlRoot}/templates`);
 app.set("view engine", "pug");

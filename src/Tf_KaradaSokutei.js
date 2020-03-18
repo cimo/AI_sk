@@ -1,15 +1,16 @@
 "use strict";
 
-/* global */
+/* global __dirname */
 
 const fs = require("fs");
+const path = require("path");
 const {Canvas, Image} = require("canvas");
 const tensorFlow = require("@tensorflow/tfjs-node");
 const poseNet = require("@tensorflow-models/posenet");
 
 const helper = require("./Helper");
 
-const urlRoot = "../public";
+const urlRoot = `${path.dirname(__dirname)}/public`;
 
 let canvas = null;
 let canvasContext = null;

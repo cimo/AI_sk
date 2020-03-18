@@ -3,6 +3,7 @@
 /* global __dirname, Uint8Array, Buffer */
 
 const fs = require("fs");
+const path = require("path");
 const {Canvas, Image} = require("canvas");
 const JsZip = require("jszip");
 const tensorFlow = require("@tensorflow/tfjs-node");
@@ -11,7 +12,7 @@ const knnClassifier = require("@tensorflow-models/knn-classifier");
 
 const helper = require("./Helper");
 
-const urlRoot = "../public";
+const urlRoot = `${path.dirname(__dirname)}/public`;
 
 let mobileNetEntity = null;
 let knnClassifierEntity = null;
