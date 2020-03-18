@@ -48,35 +48,36 @@ app.use(express.static(urlRoot));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({'extended': false}));
 
-app.get("/", digest.check((request, result) => {
+//digest.check()
+app.get("/", (request, result) => {
     result.render("index.pug");
-}));
+});
 
-app.all("/karada_sokutei", digest.check((request, result) => {
+app.all("/karada_sokutei", (request, result) => {
     tf_KaradaSokutei.execute(request, (response) => {
         if (response.ajax === true)
             result.json({'response': response});
         else
             result.render("karada_sokutei.pug", {'response': response});
     });
-}));
+});
 
-app.all("/recognition_image", digest.check((request, result) => {
+app.all("/recognition_image", (request, result) => {
     tf_RecognitionImage.execute(request, (response) => {
         if (response.ajax === true)
             result.json({'response': response});
         else
             result.render("recognition_image.pug", {'response': response});
     });
-}));
-app.all("/recognition_sound", digest.check((request, result) => {
+});
+app.all("/recognition_sound", (request, result) => {
     tf_RecognitionImage.execute(request, (response) => {
         if (response.ajax === true)
             result.json({'response': response});
         else
             result.render("recognition_sound.pug", {'response': response});
     });
-}));
+});
 
 httpServer.listen(portHttp, () => {
     helper.writeLog(`Listen on ${portHttp}`);
