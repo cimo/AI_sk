@@ -32,7 +32,7 @@ const certificates = {
 
 const digest = httpAuth.digest({
     realm: "Auth - Digest",
-    file: `${config.settings.digest.path}/.htpasswd`
+    file: `${config.settings.digest.path}/.digest_htpasswd`
 });
 
 const app = express();
