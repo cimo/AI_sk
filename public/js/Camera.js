@@ -7,6 +7,14 @@ class Camera {
     get getCanvas() {
         return this.canvas;
     }
+
+    get getCanvasContext() {
+        return this.canvasContext;
+    }
+
+    get getVideo() {
+        return this.video;
+    }
     
     set setIsMobile(value) {
         this.isMobile = value;
@@ -16,7 +24,6 @@ class Camera {
     constructor() {
         this.cameraContainerTag = "";
 
-        this.sourceContainer = null;
         this.canvas = null;
         this.canvasContext = null;
         this.resetButton = null;
@@ -27,7 +34,7 @@ class Camera {
         this.isVideo = false;
 
         this.intervalVideoEvent = null;
-        this.captureVideoTime = 1000 / 3;
+        this.captureVideoTime = 0;
         this.captureVideoEvent = null;
 
         this.audio = null;
@@ -46,38 +53,25 @@ class Camera {
         this.isReset = false;
         this.isMobile = false;
     }
-    
-    setting = (width, height) => {
+
+    setting = (captureTime, width, height) => {
         this.cameraContainerTag = "#camera_container";
 
-        this.sourceContainer = $(this.cameraContainerTag).find(".source_container");
         this.canvas = $(this.cameraContainerTag).find("canvas");
-        this.resetButton = $(this.cameraContainerTag).find(".reset");
-        
+        this.canvasContext = this.canvas[0].getContext("2d");
+
         this.video = $(this.cameraContainerTag).find("video");
         this.videoSource = $(this.cameraContainerTag).find(".video_source");
         
         this.audio = $(this.cameraContainerTag).find("audio");
         this.audioSource = $(this.cameraContainerTag).find(".audio_source");
 
-        if (width !== undefined && height !== undefined) {
-            if (this.sourceContainer !== undefined) {
-                $(this.sourceContainer).width(width);
-                $(this.sourceContainer).height(height);
-            }
+        this.resetButton = $(this.cameraContainerTag).find(".reset");
 
-            if (this.canvas !== undefined) {
-                $(this.canvas).width(width);
-                $(this.canvas).height(height);
+        if (width !== undefined && height !== undefined)
+            this._settingSize(width, height);
 
-                this.canvasContext = this.canvas[0].getContext("2d");
-            }
-
-            if (this.video !== undefined) {
-                $(this.video).width(width);
-                $(this.video).height(height);
-            }
-        }
+        this.captureVideoTime = 1000 / captureTime;
     }
     
     createVideo = () => {
@@ -86,13 +80,7 @@ class Camera {
             
             this._resetVideo();
 
-            if (navigator.mediaDevices) {
-                navigator.mediaDevices.enumerateDevices().then((devices) => {
-                    this._deviceEvent(devices);
-                }).catch((error) => {
-                    this._errorEvent(error);
-                });
-            }
+            this._enumerateDevices();
         }
         else
             this.isVideo = false;
@@ -104,13 +92,7 @@ class Camera {
             
             this._resetAudio();
 
-            if (navigator.mediaDevices) {
-                navigator.mediaDevices.enumerateDevices().then((devices) => {
-                    this._deviceEvent(devices);
-                }).catch((error) => {
-                    this._errorEvent(error);
-                });
-            }
+            this._enumerateDevices();
         }
         else
             this.isAudio = false;
@@ -119,23 +101,8 @@ class Camera {
     resize = () => {
         let width = $(this.cameraContainerTag).width();
         let height = width / 2.031;
-        
-        if (this.sourceContainer !== undefined) {
-            $(this.sourceContainer).width(width);
-            $(this.sourceContainer).height(height);
-        }
-        
-        if (this.canvas !== undefined) {
-            $(this.canvas).width(width);
-            $(this.canvas).height(height);
-            
-            this.canvasContext = this.canvas[0].getContext("2d");
-        }
-        
-        if (this.video !== undefined) {
-            $(this.video).width(width);
-            $(this.video).height(height);
-        }
+
+        this._settingSize(width, height);
     }
     
     eventLogic = () => {
@@ -158,16 +125,12 @@ class Camera {
             this.isReset = true;
 
             if (this.isVideo === true) {
-                $(this.video).hide();
-
                 $(this.videoSource).val(0);
 
                 this.createVideo();
             }
 
             if (this.isAudio === true) {
-                $(this.audio).hide();
-
                 $(this.audioSource).val(0);
 
                 this.createAudio();
@@ -179,20 +142,12 @@ class Camera {
         if ($(this.videoSource).val() !== "0") {
             this._resetVideo();
 
-            $(this.video).show();
-
-            navigator.mediaDevices.getUserMedia(this.userMediaElements).then((stream) => {
-                this._successEvent(stream);
-            }).catch((error) => {
-                this._errorEvent(error);
-            });
+            this._userMedia();
         }
     }
     
     stopCaptureVideo = () => {
         this._resetVideo();
-
-        $(this.video).hide();
     }
     
     captureVideoCallback = (callback) => {
@@ -204,20 +159,12 @@ class Camera {
         if ($(this.audioSource).val() !== "0") {
             this._resetAudio();
 
-            $(this.audio).hide();
-
-            navigator.mediaDevices.getUserMedia(this.userMediaElements).then((stream) => {
-                this._successEvent(stream);
-            }).catch((error) => {
-                this._errorEvent(error);
-            });
+            this._userMedia();
         }
     }
     
     stopCaptureAudio = () => {
         this._resetAudio();
-
-        $(this.audio).hide();
     }
     
     captureAudioCallback = (callback) => {
@@ -226,6 +173,32 @@ class Camera {
     }
     
     // Functions private
+    _settingSize = (width, height) => {
+        if (this.canvas[0] !== undefined) {
+            this.canvas[0].width = width;
+            this.canvas[0].height = height;
+        }
+
+        if (this.video[0] !== undefined) {
+            this.video[0].width = width;
+            this.video[0].height = height;
+        }
+
+        if (this.audio[0] !== undefined) {
+            //...
+        }
+    }
+
+    _enumerateDevices = () => {
+        if (navigator.mediaDevices) {
+            navigator.mediaDevices.enumerateDevices().then((devices) => {
+                this._deviceEvent(devices);
+            }).catch((error) => {
+                this._errorEvent(error);
+            });
+        }
+    }
+
     _deviceEvent = (devices) => {
         this.videoOptions = {
             'video_0': false
@@ -271,7 +244,17 @@ class Camera {
         
         this.isReset = false;
     }
-    
+
+    _userMedia = () => {
+        if (navigator.mediaDevices) {
+            navigator.mediaDevices.getUserMedia(this.userMediaElements).then((stream) => {
+                this._successEvent(stream);
+            }).catch((error) => {
+                this._errorEvent(error);
+            });
+        }
+    }
+
     _successEvent = (stream) => {
         this.stream = stream;
         

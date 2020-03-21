@@ -2,12 +2,31 @@
 
 /* global */
 
+const digestEnable = false;
+
 exports.settings = {
     'certificates': {
         'key': "/etc/certificates/lsv2.machine.local/Encrypted.key.insecure",
         'cert': "/etc/certificates/lsv2.machine.local/Encrypted.crt"
     },
     'digest': {
-        'path': "/home/cimo/www"
+        'path': "/home/cimo/www",
+        'enable': digestEnable
     }
+};
+
+exports.digestCheck = (digest, callback) => {
+    let self = this;
+
+    if (digestEnable === true) {
+        return digest.check((req, res) => {
+            callback.apply(self, [req, res]);
+        });
+    }
+    else {
+        return (req, res) => {
+            callback.apply(self, [req, res]);
+        };
+    }
+
 };

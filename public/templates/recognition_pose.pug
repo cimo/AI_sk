@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Recognition image</title>
+        <title>Recognition pose</title>
         
         <!-- Meta -->
         <meta charset="UTF-8"/>
@@ -14,14 +14,14 @@
         
         <!-- Favicon -->
         <link href="images/favicon.ico" rel="icon" type="image/x-icon">
-        
+
         <!-- Css -->
-        <link href="css/recognition_image.css" rel="stylesheet"/>
+        <link href="css/recognition_pose.css" rel="stylesheet"/>
     </head>
     <body>
         <div id="main_container">
             include include/websocket.pug
-            
+
             include include/camera.pug
 
             <p id="info"></p>
@@ -32,30 +32,29 @@
                     <button class="stop_capture" type="button">Stop capture</button>
                 </div>
                 <div>
-                    <button class="learn_file_button" type="button">Learn from file</button>
-                </div>
-                <div>
-                    <input class="learn_camera_label" name="learnFromCameraLabel" value=""/>
-                    <button class="learn_camera_button" type="button">Learn from camera</button>
+                    <button class="find_point_image" type="button">Find point from image</button>
                 </div>
             </div>
             <div id="prediction">
-                <p class="text"></p>
-                <p class="label"></p>
+                <img class="image"/>
+                <ul class="position"></ul>
+                <ul class="distance"></ul>
             </div>
         </div>
-        
+
         <script src="js/library/jquery_3.4.1.min.js"></script>
         <script src="js/library/socket.io_2.3.0.min.js"></script>
+        <script src="https://unpkg.com/@tensorflow/tfjs"></script>
+        <script src="https://unpkg.com/@tensorflow-models/posenet"></script>
         <script src="js/Camera.js"></script>
-        <script src="js/RecognitionImage.js"></script>
-        
+        <script src="js/RecognitionPose.js"></script>
+
         script.
             $(document).ready(() => {
                 let socketIo = io();
-                
+
                 socketIo.connect("https://lsv2.machine.local");
-                
+
                 socketIo.on("broadcast", (data) => {
                     $("#ws_container .ws_broadcast").html(data);
                 });
@@ -65,10 +64,11 @@
                 socketIo.on("message", (data) => {
                     $("#ws_container .ws_message").html(data);
                 });
-                
-                let recognitionImage = new RecognitionImage(socketIo);
 
-                recognitionImage.eventLogic();
+                let recognitionPose = new RecognitionPose(socketIo);
+
+                recognitionPose.createRealtimePosition();
+                recognitionPose.eventLogic();
             });
     </body>
 </html>

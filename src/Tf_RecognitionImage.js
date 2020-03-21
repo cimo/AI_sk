@@ -17,6 +17,8 @@ const urlRoot = `${path.dirname(__dirname)}/public`;
 let mobileNetEntity = null;
 let knnClassifierEntity = null;
 
+let socketTag = "ri_";
+
 let response = {
     'messages': {},
     'values': {},
@@ -28,19 +30,19 @@ exports.startup = async() => {
     
     knnClassifierEntity = knnClassifier.create();
     
-    await readBrain();
+    await _readBrain();
 };
 
-exports.socketEvent = async(socket) => {
-    socket.on("predictionFromCamera", async(base64) => {
-        let prediction = await predictionFromCamera(base64);
+exports.socketEvent = async(socketIo, socket) => {
+    socket.on(`${socketTag}predictionFromCamera`, async(data) => {
+        let prediction = await _predictionFromCamera(data);
         
         if (prediction !== null)
-            socket.emit("predictionLabel", prediction.label);
+            socket.emit(`${socketTag}prediction`, prediction);
     });
     
-    socket.on("learnFromCamera", async(json) => {
-        await learnFromCamera(json);
+    socket.on(`${socketTag}learnFromCamera`, async(data) => {
+        await _learnFromCamera(data);
     });
 };
 
@@ -49,7 +51,7 @@ exports.execute = async(request, callback) => {
         //...
     }
     else if (request.body.event === "learnFromFile") {
-        learnFromFile();
+        _learnFromFile();
         
         response.ajax = true;
     }
@@ -63,7 +65,7 @@ exports.execute = async(request, callback) => {
     };
 };
 
-const readBrain = async() => {
+const _readBrain = async() => {
     try {
         let dataset = JSON.parse(fs.readFileSync(`${urlRoot}/files/recognition_image/brain.json`));
         let datasetResult = {};
@@ -77,13 +79,13 @@ const readBrain = async() => {
         helper.writeLog("Read brain completed.");
     }
     catch (error) {
-        await writeBrain();
+        await _writeBrain();
         
-        await readBrain();
+        await _readBrain();
     }
 };
 
-const writeBrain = () => {
+const _writeBrain = () => {
     let datasets = knnClassifierEntity.getClassifierDataset();
     let datasetResult = {};
     
@@ -96,50 +98,48 @@ const writeBrain = () => {
     helper.writeLog("Write brain completed.");
 };
 
-const learnFromFile = () => {
-    let data = fs.readFileSync(`${urlRoot}/files/recognition_image/learn.zip`);
-    
-    if (data !== false) {
-        let zip = new JsZip();
-        
-        zip.loadAsync(data).then((contents) => {
-            for (const [key, value] of Object.entries(contents.files)) {
-                if (value.dir === false) {
-                    let hiddenFile = value.name.substring(0, 2);
-                    
-                    if (hiddenFile !== "__") {
-                        zip.file(value.name).async("nodebuffer").then((buffer) => {
-                            createClass("file", buffer, key);
-                            createClass("file", buffer, key);
-                            createClass("file", buffer, key);
-                            
-                            writeBrain();
-                        });
-                    }
-                }
-            }
-        });
-        
-        response.messages.success = "Learn from file completed.";
-        
-        helper.writeLog("Learn from file completed.");
+const _predictionFromCamera = async(base64) => {
+    let prediction = null;
+
+    if (base64 !== undefined && knnClassifierEntity !== null && knnClassifierEntity.getNumClasses() > 0) {
+        let imageCanvas = await _createImageCanvas(base64);
+
+        let classification = _createClassification("canvas", imageCanvas);
+
+        prediction = knnClassifierEntity.predictClass(classification);
     }
-    else {
-        response.messages.error = "Learn from file not completed!";
-        
-        helper.writeLog("Learn from file not completed!");
-    }
+
+    return prediction;
 };
 
-const learnFromCamera = async(json) => {
+const _createImageCanvas = async(buffer) => {
+    let image = null;
+
+    const imageLoadPromise = new Promise(resolve => {
+        image = new Image();
+        image.onload = resolve;
+        image.src = buffer;
+    });
+
+    await imageLoadPromise;
+
+    let canvas = new Canvas(image.width, image.height);
+    let canvasContext = canvas.getContext("2d");
+
+    canvasContext.drawImage(image, 0, 0);
+
+    return canvas;
+};
+
+const _learnFromCamera = async(json) => {
     if (json !== undefined) {
-        let imageCanvas = await createImageCanvas(json.base64);
-        
-        createClass("canvas", imageCanvas, json.label);
-        createClass("canvas", imageCanvas, json.label);
-        createClass("canvas", imageCanvas, json.label);
-        
-        writeBrain();
+        let imageCanvas = await _createImageCanvas(json.base64);
+
+        _createClassification("canvas", imageCanvas, json.label);
+        _createClassification("canvas", imageCanvas, json.label);
+        _createClassification("canvas", imageCanvas, json.label);
+
+        _writeBrain();
         
         helper.writeLog("Learn from camera completed.");
     }
@@ -147,44 +147,42 @@ const learnFromCamera = async(json) => {
         helper.writeLog("Learn from camera error!");
 };
 
-const predictionFromCamera = async(base64) => {
-    let prediction = null;
-    
-    if (base64 !== undefined && knnClassifierEntity !== null && knnClassifierEntity.getNumClasses() > 0) {
-        let imageCanvas = await createImageCanvas(base64);
-        
-        let imageTensor = tensorFlow.browser.fromPixels(imageCanvas);
-        
-        let classification = mobileNetEntity.infer(imageTensor, "conv_preds");
-        
-        imageTensor.dispose();
-        
-        prediction = knnClassifierEntity.predictClass(classification);
+const _learnFromFile = () => {
+    let data = fs.readFileSync(`${urlRoot}/files/recognition_image/learn.zip`);
+
+    if (data !== false) {
+        let zip = new JsZip();
+
+        zip.loadAsync(data).then((contents) => {
+            for (const [key, value] of Object.entries(contents.files)) {
+                if (value.dir === false) {
+                    let hiddenFile = value.name.substring(0, 2);
+
+                    if (hiddenFile !== "__") {
+                        zip.file(value.name).async("nodebuffer").then((buffer) => {
+                            _createClassification("file", buffer, key);
+                            _createClassification("file", buffer, key);
+                            _createClassification("file", buffer, key);
+
+                            _writeBrain();
+                        });
+                    }
+                }
+            }
+        });
+
+        response.messages.success = "Learn from file completed.";
+
+        helper.writeLog("Learn from file completed.");
     }
-    
-    return prediction;
+    else {
+        response.messages.error = "Learn from file not completed!";
+
+        helper.writeLog("Learn from file not completed!");
+    }
 };
 
-const createImageCanvas = async(buffer) => {
-    let image = null;
-    
-    const imageLoadPromise = new Promise(resolve => {
-        image = new Image();
-        image.onload = resolve;
-        image.src = buffer;
-    });
-    
-    await imageLoadPromise;
-    
-    let canvas = new Canvas(image.width, image.height);
-    let canvasContext = canvas.getContext("2d");
-    
-    canvasContext.drawImage(image, 0, 0);
-    
-    return canvas;
-};
-
-const createClass = (type, image, label) => {
+const _createClassification = (type, image, label) => {
     let imageTensor = null;
     
     if (type === "file")
@@ -198,9 +196,11 @@ const createClass = (type, image, label) => {
     
     if (label !== undefined)
         knnClassifierEntity.addExample(classification, label);
+
+    return classification;
 };
 
-const readImageFile = (path) => {
+const _readImageFile = (path) => {
     let data = fs.readFileSync(path);
     let arrayByte = Uint8Array.from(Buffer.from(data));
     

@@ -6,30 +6,36 @@ class RecognitionImage {
     // Properties
     
     // Functions public
-    constructor(websocket) {
-        this.websocket = websocket;
-        
+    constructor(socketIo) {
+        this.socketIo = socketIo;
+        this.socketTag = "ri_";
+
         this.camera = new Camera();
-    }
-    
-    communication = () => {
-        this.websocket.messageFromServer("#prediction .label", "predictionLabel", () => {
-            //...
-        });
-        
         this.camera.setIsMobile = false;
-        this.camera.setting(320, 180);
+        this.camera.setting(3, 1280, 720);
         this.camera.createVideo();
         this.camera.eventLogic();
-        
-        this.camera.captureVideoCallback(() => {
-            let base64 = this.camera.getCanvas[0].toDataURL("image/jpeg");
-            
-            this.websocket.sendMessage("predictionFromCamera", base64);
-        });
     }
     
     eventLogic = () => {
+        this.camera.captureVideoCallback(() => {
+            let base64 = this.camera.getCanvas[0].toDataURL("image/jpeg");
+
+            this.socketIo.emit(`${this.socketTag}predictionFromCamera`, base64);
+        });
+
+        this.socketIo.on(`${this.socketTag}prediction`, (data) => {
+            this._showPrediction(data);
+        });
+
+        $("#command_container").find(".learn_camera_button").on("click", "", (event) => {
+            let label = $("#command_container").find(".learn_camera_label").val();
+            let base64 = this.camera.getCanvas[0].toDataURL("image/jpeg");
+
+            if (label !== "" && base64 !== "")
+                this.socketIo.emit(`${this.socketTag}learnFromCamera`, {'label': label, 'base64': base64});
+        });
+
         $("#command_container").find(".start_capture").on("click", "", (event) => {
             this.camera.startCaptureVideo();
         });
@@ -43,7 +49,8 @@ class RecognitionImage {
                 'url': window.location.href,
                 'method': "post",
                 'data': {
-                    'event': "learnFromFile"
+                    'event': "learnFromFile",
+                    '_csrf': $("meta[name='csrf-token']").attr("content")
                 },
                 'dataType': "json",
                 'cache': false,
@@ -52,24 +59,24 @@ class RecognitionImage {
                 beforeSend: () => {
                 },
                 success: (xhr) => {
-                    console.log(xhr.response);
+                    if (xhr.response.messages.success !== undefined)
+                        this._showInfo(xhr.response.messages.success);
                 },
                 error: (xhr, status) => {
-                    console.log(xhr.response, status);
+                    console.log(xhr, status);
                 },
                 complete: () => {
                 }
             });
         });
-        
-        $("#command_container").find(".learn_camera_button").on("click", "", (event) => {
-            let label = $("#command_container").find(".learn_camera_label").val();
-            let base64 = this.camera.getCanvas[0].toDataURL("image/jpeg");
-            
-            if (label !== "" && base64 !== "")
-                this.websocket.sendMessage("learnFromCamera", {'label': label, 'base64': base64});
-        });
     }
     
     // Functions private
+    _showInfo = (messasge) => {
+        $("#info").html(messasge);
+    }
+
+    _showPrediction = (response) => {
+        $("#prediction .label").html(response.label);
+    }
 }

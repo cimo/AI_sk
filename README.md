@@ -5,8 +5,9 @@ TensorFlowJs code collection with NodeJs.
 
 | Info: |
 |:---|
-| Find body point from image |
 | Learn from webcam and image |
+| Learn from microphone - Work in progress...|
+| Find body pose from webcam and image |
 
 | Library: |
 |:---|

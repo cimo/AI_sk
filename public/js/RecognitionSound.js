@@ -6,14 +6,15 @@ class RecognitionSound {
     // Properties
     
     // Functions public
-    constructor(websocket) {
-        this.websocket = websocket;
+    constructor(socketIo) {
+        this.socketIo = socketIo;
+        this.socketTag = "rs_";
         
         this.camera = new Camera();
     }
     
     communication = () => {
-        this.websocket.messageFromServer("#prediction .label", "predictionLabel", () => {
+        this.socketIo.on(`${this.socketTag}prediction`, (data) => {
             //...
         });
         

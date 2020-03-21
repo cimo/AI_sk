@@ -2,6 +2,15 @@
 
 /* global */
 
+// Send to connected client
+//socket.emit("label", "message");
+
+// Send to all connected clients
+//socketIoServer.emit("label", "message");
+
+// Send to all clients except sender
+//socket.broadcast.emit("message");
+
 const helper = require("./Helper");
 
 let connectionCount = 0;

@@ -10,6 +10,7 @@
         <meta name="description" content="..."/>
         <meta name="keywords" content="..."/>
         <meta name="robots" content="index, follow"/>
+        <meta name="csrf-token" content="#{csrfToken}">
         
         <!-- Favicon -->
         <link href="images/favicon.ico" rel="icon" type="image/x-icon">
@@ -22,7 +23,9 @@
             include include/websocket.pug
             
             include include/camera.pug
-            
+
+            <p id="info"></p>
+
             <div id="command_container">
                 <div>
                     <button class="start_capture" type="button">Start capture</button>
@@ -38,21 +41,26 @@
         
         <script src="js/library/jquery_3.4.1.min.js"></script>
         <script src="js/library/socket.io_2.3.0.min.js"></script>
-        <script src="js/Websocket.js"></script>
         <script src="js/Camera.js"></script>
         <script src="js/RecognitionSound.js"></script>
         
         script.
             $(document).ready(() => {
-                let websocket = new Websocket();
+                let socketIo = io();
+
+                socketIo.connect("https://lsv2.machine.local");
+
+                socketIo.on("broadcast", (data) => {
+                    $("#ws_container .ws_broadcast").html(data);
+                });
+                socketIo.on("serverTime", (data) => {
+                    $("#ws_container .ws_serverTime").html(data);
+                });
+                socketIo.on("message", (data) => {
+                    $("#ws_container .ws_message").html(data);
+                });
                 
-                websocket.getSocketIo.connect("https://lsv2.machine.local");
-                
-                websocket.messageFromServerBroadcast("#ws_container .ws_broadcast");
-                websocket.messageFromServer("#ws_container .ws_serverTime", "serverTime");
-                websocket.messageFromServer("#ws_container .ws_message", "message");
-                
-                let recognitionSound = new RecognitionSound(websocket);
+                let recognitionSound = new RecognitionSound(socketIo);
                 
                 recognitionSound.communication();
                 recognitionSound.eventLogic();

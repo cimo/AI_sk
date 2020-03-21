@@ -3,6 +3,6 @@
     height: 480px;
 }
 
-#camera_container .source_container canvas {
+#camera_container .source_container video {
     display: none;
 }
