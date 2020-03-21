@@ -20,8 +20,8 @@ const sio_Websocket = require("./Sio_Websocket");
 const tf_RecognitionPose = require("./Tf_RecognitionPose");
 const tf_RecognitionImage = require("./Tf_RecognitionImage");
 
-const portHttp = 2080;
-const portHttps = 2443;
+const portHttp = 1080;
+const portHttps = 1443;
 
 const urlRoot = `${path.dirname(__dirname)}/public`;
 

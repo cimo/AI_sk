@@ -28,5 +28,4 @@ exports.digestCheck = (digest, callback) => {
             callback.apply(self, [req, res]);
         };
     }
-
 };
