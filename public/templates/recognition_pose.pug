@@ -36,7 +36,6 @@
                 </div>
             </div>
             <div id="prediction">
-                <img class="image"/>
                 <ul class="position"></ul>
                 <ul class="distance"></ul>
             </div>
@@ -44,8 +43,8 @@
 
         <script src="js/library/jquery_3.4.1.min.js"></script>
         <script src="js/library/socket.io_2.3.0.min.js"></script>
-        <script src="https://unpkg.com/@tensorflow/tfjs"></script>
-        <script src="https://unpkg.com/@tensorflow-models/posenet"></script>
+        <script src="js/library/tfj.min.js"></script>
+        <script src="js/library/posenet.min.js"></script>
         <script src="js/Camera.js"></script>
         <script src="js/RecognitionPose.js"></script>
 
@@ -67,7 +66,6 @@
 
                 let recognitionPose = new RecognitionPose(socketIo);
 
-                recognitionPose.createRealtimePosition();
                 recognitionPose.eventLogic();
             });
     </body>

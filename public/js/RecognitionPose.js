@@ -10,21 +10,19 @@ class RecognitionPose {
         this.socketIo = socketIo;
         this.socketTag = "rp_";
 
-        this.posenet = null;
+        this.poseNet = null;
+        this.resolution = {'width': 640, 'height': 480};
 
         this.camera = new Camera();
         this.camera.setIsMobile = false;
-        this.camera.setting(60,640, 480);
+        this.camera.setting(60, this.resolution.width, this.resolution.height);
         this.camera.createVideo();
         this.camera.eventLogic();
 
         this.image = null;
-    }
 
-    createRealtimePosition = async() => {
-        this.posenet = await posenet.load();
-
-        this._showRealtimePosition();
+        this.requestAnimationFrameLoop = false;
+        this.requestAnimationFrameId = null;
     }
 
     eventLogic = () => {
@@ -39,64 +37,67 @@ class RecognitionPose {
             this._showDistance(data, "Distance from leftEye to rightEye are: ");
         });
 
-        $("#command_container").find(".start_capture").on("click", "", (event) => {
-            this.camera.startCaptureVideo();
+        $("#command_container").find(".start_capture").on("click", "", async(event) => {
+            if (this.requestAnimationFrameLoop === false) {
+                this.camera.startCaptureVideo();
+
+                await this._settingPoseNet("realtime");
+
+                this._estimatePose();
+            }
         });
 
         $("#command_container").find(".stop_capture").on("click", "", (event) => {
             this.camera.stopCaptureVideo();
+
+            this.requestAnimationFrameLoop = false;
         });
 
-        $("#command_container").find(".find_point_image").on("click", "", (event) => {
-            this.camera.stopCaptureVideo();
+        $("#command_container").find(".find_point_image").on("click", "", async(event) => {
+            if (this.requestAnimationFrameLoop === false) {
+                this.camera.stopCaptureVideo();
 
-            $.ajax({
-                'url': window.location.href,
-                'method': "post",
-                'data': {
-                    'event': "predictionFromImage",
-                    '_csrf': $("meta[name='csrf-token']").attr("content")
-                },
-                'dataType': "json",
-                'cache': false,
-                'processData': true,
-                'contentType': "application/x-www-form-urlencoded; charset=UTF-8",
-                beforeSend: () => {
-                },
-                success: (xhr) => {
-                    $("#info").html("");
-                    
-                    if (xhr.response.messages.error !== undefined)
-                        this._showInfo(xhr.response.messages.error);
-                    else if (xhr.response.values.canvasDataUrl !== undefined) {
-                        this._showImage(xhr.response);
-                        this._showPosition(xhr.response);
-                        this._showDistance(xhr.response, "Distance from leftEye to rightEye are: ");
-                    }
-                },
-                error: (xhr, status) => {
-                    console.log(xhr, status);
-                },
-                complete: () => {
-                }
-            });
+                this.image = await this._createImage("/files/recognition_pose/source.png");
+
+                this.camera.getCanvasContext.clearRect(0, 0, this.camera.getCanvas[0].width, this.camera.getCanvas[0].height);
+                this.camera.getCanvasContext.drawImage(this.image, 0, 0, this.image.width, this.image.height);
+
+                await this._settingPoseNet("image");
+
+                this._estimatePose();
+
+                this.requestAnimationFrameLoop = false;
+            }
         });
     }
     
     // Functions private
-    _showInfo = (messasge) => {
-        $("#info").html(messasge);
+    _settingPoseNet = async(type) => {
+        this.poseNet = null;
+
+        if (type === "realtime")
+            this.poseNet = await posenet.load();
+        else if (type === "image") {
+            this.poseNet = await posenet.load({
+                'architecture': "MobileNetV1",
+                'outputStride': 16,
+                'inputResolution': this.resolution,
+                'multiplier': 0.75
+            });
+        }
+
+        this.requestAnimationFrameLoop = true;
     }
 
-    _showRealtimePosition = async() => {
-        if (this.posenet !== null && this.image !== null) {
+    _estimatePose = async() => {
+        if (this.poseNet !== null && this.image !== null) {
             let results = {'values': {'elements': {'position': [], 'distance': []}}};
 
-            const poses = await this.posenet.estimateSinglePose(this.image, {
+            const poses = await this.poseNet.estimateSinglePose(this.image, {
                 'flipHorizontal': false
             });
 
-            let pointSize = 10;
+            let pointSize = 5;
 
             for (const [key, value] of Object.entries(poses.keypoints)) {
                 results.values.elements.position.push({
@@ -116,23 +117,36 @@ class RecognitionPose {
                 results.values.elements.distance.push(distance);
             }
 
-            this.socketIo.emit(`${this.socketTag}showRealtimePosition`, results);
+            this.socketIo.emit(`${this.socketTag}estimatePose`, results);
         }
 
-        requestAnimationFrame(this._showRealtimePosition);
+        if (this.requestAnimationFrameLoop === true)
+            this.requestAnimationFrameId = requestAnimationFrame(this._estimatePose);
+        else
+            cancelAnimationFrame(this.requestAnimationFrameId);
     }
 
-     _findDistance = (p, q) => {
+    _findDistance = (p, q) => {
         let dx = p.x - q.x;
         let dy = p.y - q.y;
 
         return Math.sqrt(dx * dx + dy * dy);
     };
 
-    _showImage = (response) => {
-        $("#prediction").find(".image").attr("src", response.values.canvasDataUrl);
+    _createImage = async(buffer) => {
+        let image = null;
+
+        const imageLoadPromise = new Promise(resolve => {
+            image = new Image();
+            image.onload = resolve;
+            image.src = buffer;
+        });
+
+        await imageLoadPromise;
+
+        return image;
     }
-    
+
     _showPosition = (response) => {
         $("#prediction").find(".position").html("");
         
@@ -155,20 +169,6 @@ class RecognitionPose {
         let distance = (elements.distance / dpi) * 2.54;
 
         $("#prediction").find(".distance").append(`<li>${message} ${distance.toFixed(2)} cm.</li>`);
-    }
-
-    _createImage = async(buffer) => {
-        let image = null;
-
-        const imageLoadPromise = new Promise(resolve => {
-            image = new Image();
-            image.onload = resolve;
-            image.src = buffer;
-        });
-
-        await imageLoadPromise;
-
-        return image;
     }
 
     _screenDpi = () => {
