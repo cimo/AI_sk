@@ -15,3 +15,7 @@ TensorFlowJs code collection with NodeJs.
 | Socket.io - https://socket.io |
 
 <b>By CIMO - https://reinventsoftware.org</b>
+
+Supported By:
+
+![Image of supporter](https://avatars0.githubusercontent.com/u/878437?s=200&v=4)
