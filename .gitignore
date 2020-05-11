@@ -47,7 +47,6 @@ Temporary Items
 .apdisk
 
 # cimo
-nbproject
 src/node_modules
 src/package-lock.json
 src/Config.js
