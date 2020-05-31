@@ -6,11 +6,11 @@ const digestEnable = false;
 
 exports.settings = {
     'certificates': {
-        'key': "/etc/certificates/lsv2.machine.local/Encrypted.key.insecure",
-        'cert': "/etc/certificates/lsv2.machine.local/Encrypted.crt"
+        'key': "/etc/certificates/Encrypted.key",
+        'cert': "/etc/certificates/Encrypted.crt"
     },
     'digest': {
-        'path': "/home/cimo/www",
+        'path': "/home/node/app",
         'enable': digestEnable
     }
 };
