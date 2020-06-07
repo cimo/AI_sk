@@ -6,8 +6,8 @@ const digestEnable = false;
 
 exports.settings = {
     'certificates': {
-        'key': "/etc/certificates/Encrypted.key",
-        'cert': "/etc/certificates/Encrypted.crt"
+        'key': "/etc/certificate/Encrypted.key",
+        'cert': "/etc/certificate/Encrypted.crt"
     },
     'digest': {
         'path': "/home/node/app",
