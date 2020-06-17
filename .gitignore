@@ -47,8 +47,9 @@ Temporary Items
 .apdisk
 
 # cimo
-error.log
 src/node_modules
 src/package-lock.json
 src/Config.js
 src/debug.log
+error.log
+debug.log
