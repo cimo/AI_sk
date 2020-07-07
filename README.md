@@ -6,7 +6,7 @@ Starter kit code for web apply. Create in a few steps the complete AI project.
 | Info: |
 |:---|
 | Learn from webcam and image |
-| Learn from microphone - Work in progress...|
+| Learn from microphone |
 | Find body pose from webcam and image |
 
 | Library: |
