@@ -1,7 +1,7 @@
-TensorFlowJs example
+AI sk
 ==============
 
-Starter kit code with TensorFlowJs for create, in a few step, the AI project.
+Starter kit code for web apply. Create in a few steps the complete AI project.
 
 | Info: |
 |:---|
