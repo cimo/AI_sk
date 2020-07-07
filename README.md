@@ -1,7 +1,7 @@
 TensorFlowJs example
 ==============
 
-TensorFlowJs code collection with NodeJs.
+Starter kit code with TensorFlowJs for create, in a few step, the AI project.
 
 | Info: |
 |:---|
@@ -12,7 +12,6 @@ TensorFlowJs code collection with NodeJs.
 | Library: |
 |:---|
 | TensorFlowJs - https://tensorflow.org |
-| Socket.io - https://socket.io |
 
 <b>By CIMO - https://reinventsoftware.org</b>
 
