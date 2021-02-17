@@ -1,10 +1,11 @@
 AI sk
 ==============
 
-Starter kit code for web apply. Create in a few steps the complete AI project.
+Starter kit code for web app. Create in a few steps the complete AI project.
 
 | Info: |
 |:---|
+| Cross platform (Windows, Linux, Mac, Android, Ios) |
 | Learn from webcam and image |
 | Learn from microphone |
 | Find body pose from webcam and image |
@@ -13,7 +14,7 @@ Starter kit code for web apply. Create in a few steps the complete AI project.
 |:---|
 | TensorFlowJs - https://tensorflow.org |
 
-<b>By CIMO - https://reinventsoftware.org</b>
+By CIMO - https://reinventsoftware.org
 
 Supported By:
 

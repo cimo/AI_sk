@@ -46,9 +46,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# cimo
+# cimo +
 src/node_modules
-src/package-lock.json
 src/Config.js
 src/debug.log
 error.log
