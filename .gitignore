@@ -21,6 +21,7 @@ pnpm-debug.log*
 
 # cimo +
 src/Config.js
+
 .digest_htpasswd
 .env
 error.log
